@@ -32,6 +32,7 @@ function draw() {
 function mouseReleased() {
   isDrawing = false;
 }
+
 function mouseDragged() {
   circleX = mouseX;
   circleY = mouseY;

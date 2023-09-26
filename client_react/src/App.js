@@ -1,5 +1,9 @@
+import { useState } from "react";
+
 export default () => {
-  return <div>wefwea</div>;
+  const [hello, setHello] = useState("this is room for catchmind");
+
+  return <div className="App">{hello}</div>;
 };
 
 // import logo from './logo.svg';

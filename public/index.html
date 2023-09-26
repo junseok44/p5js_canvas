@@ -34,7 +34,11 @@
       <div class="chatting__messages"></div>
       <form class="chatting__form" onsubmit="send_message(event)">
         <input type="text" class="chatting__input" />
-        <button type="submit" class="chatting__submit" onclick="send_message()">
+        <button
+          type="submit"
+          class="chatting__submit"
+          onclick="send_message(event)"
+        >
           전송
         </button>
       </form>

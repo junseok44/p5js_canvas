@@ -1,6 +1,7 @@
-let socket = io();
+let socket = io("/rooms");
 
 socket.on("message", (data) => {
+  console.log(data);
   const node = createMessageNode(data.msg);
   msgContainer.appendChild(node);
 });

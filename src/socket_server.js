@@ -3,7 +3,10 @@ const httpServer = require("./app.js");
 
 let io = require("socket.io")(httpServer);
 
-io.on("connection", (socket) => {
+const room = io.of("/rooms");
+const lobby = io.of("/lobby");
+
+room.on("connection", (socket) => {
   socket.data.username = "anonymous";
   console.log("we have a new client" + socket.id);
   socket.emit("message", {
@@ -11,14 +14,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_msg", (data) => {
-    io.sockets.emit("message", {
+    console.log("received");
+    room.emit("message", {
       msg: formatMessage(`${socket.data.username}`, data.msg),
     });
   });
 
   socket.on("disconnect", () => {
     console.log("socket disconnected");
-    io.sockets.emit("message", {
+    room.emit("message", {
       msg: formatMessage(
         "server",
         `${socket.data.username} has leaved the game`
@@ -33,4 +37,8 @@ io.on("connection", (socket) => {
   socket.on("reset", function (data) {
     socket.broadcast.emit("reset", data);
   });
+});
+
+lobby.on("connection", (socket) => {
+  socket.emit("show rooms");
 });

@@ -4,105 +4,77 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sketch server</title>
-    <!-- <link rel="stylesheet" type="text/css" href="./style.css" /> -->
-    <style>
-      body {
-        padding: 0;
-        margin: 0;
-        background-color: white;
-      }
-
-      .p5Canvas {
-        border: 1px solid black;
-      }
-
-      .color__palette {
-        display: flex;
-      }
-      .color__item {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        background-color: black;
-        cursor: pointer;
-      }
-
-      .color__item.selected {
-        border: 2px solid black;
-      }
-
-      #red {
-        background-color: red;
-      }
-
-      #yellow {
-        background-color: yellow;
-      }
-
-      #green {
-        background-color: green;
-      }
-
-      #orange {
-        background-color: orange;
-      }
-
-      #pink {
-        background-color: pink;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
     <h1>캐치마인드 with p5.js</h1>
     <label for="strokeWeight">크기</label>
-    <input type="range" max="20" min="1" id="strokeWeight" />
+    <input
+      type="range"
+      max="20"
+      min="1"
+      id="strokeWeight"
+      onchange="onChangeStrokeWeight(event)"
+    />
     <button onclick="setEraser()">지우개</button>
     <button onclick="setPaint()">펜</button>
     <button onclick="resetCanvas()">리셋하기</button>
     <button onclick="saveImage()">이미지 저장</button>
 
     <div class="color__palette">
-      <div class="color__item" id="red" data-id=""></div>
+      <div class="color__item" id="red"></div>
       <div class="color__item" id="yellow"></div>
       <div class="color__item" id="green"></div>
       <div class="color__item" id="orange"></div>
       <div class="color__item" id="pink"></div>
     </div>
+
+    <div class="chatting__box">
+      <div class="chatting__messages"></div>
+      <form class="chatting__form" onsubmit="send_message(event)">
+        <input type="text" class="chatting__input" />
+        <button type="submit" class="chatting__submit" onclick="send_message()">
+          전송
+        </button>
+      </form>
+    </div>
+
     <script
       language="javascript"
       type="text/javascript"
       src="/socket.io.js"
     ></script>
-
     <script src="p5.min.js"></script>
-    <!-- <script src="p5.sound.min.js"></script> -->
     <script src="paint.js"></script>
+    <script src="socket_client.js"></script>
     <script>
-      let socket = io();
-
-      socket.on("mouse", function (data) {
-        line(data.prevX, data.prevY, data.x, data.y);
-      });
-
-      socket.on("reset", () => {
-        clear();
-      });
+      const msgContainer = document.querySelector(".chatting__messages");
+      const msgInput = document.querySelector(".chatting__input");
+      function createMessageNode(msg) {
+        let node = document.createElement("div");
+        node.innerHTML = msg;
+        return node;
+      }
     </script>
     <script>
+      function send_message(event) {
+        event.preventDefault();
+        var msg = msgInput.value;
+        socket.emit("send_msg", { msg: msg });
+        msgInput.value = "";
+      }
+
       function setEraser() {
         colorItems.forEach((item) => {
           item.classList.remove("selected");
         });
         stroke(255);
-        cursor(
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJIC9gsoWz1xkIGWnIZbtoxRb1308aTxS-Vw&usqp=CAU"
-        );
       }
 
       function setPaint() {
         stroke(0);
-        cursor("https://avatars0.githubusercontent.com/u/1617169?s=16");
+        // cursor("https://avatars0.githubusercontent.com/u/1617169?s=16");
       }
 
       function resetCanvas() {
@@ -112,6 +84,11 @@
 
       function saveImage() {
         saveCanvas(canvas1, "myImage", "jpg");
+      }
+
+      function onChangeStrokeWeight(e) {
+        strokeWeight(e.target.value);
+        cursorWidth = e.target.value;
       }
     </script>
     <script>
@@ -124,13 +101,6 @@
           e.target.classList.add("selected");
           stroke(e.target.id);
         });
-      });
-    </script>
-    <script>
-      const strokeWeightInput = document.querySelector("#strokeWeight");
-      strokeWeightInput.addEventListener("change", (e) => {
-        strokeWeight(e.target.value);
-        cursorWidth = e.target.value;
       });
     </script>
   </body>

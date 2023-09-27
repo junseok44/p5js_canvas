@@ -4,6 +4,13 @@ socket.on("message", (data) => {
   console.log(data);
   const node = createMessageNode(data.msg);
   msgContainer.appendChild(node);
+
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+});
+
+socket.on("set_name", (data) => {
+  const username = document.querySelector("#username");
+  username.innerHTML = data.name;
 });
 
 socket.on("paint", function (data) {

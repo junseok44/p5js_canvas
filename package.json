@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+  "nodemonConfig": {
+    "ignore": [],
+    "watch": [
+      "src/"
+    ]
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch .././ ./src/server.js"
+    "start": "nodemon ./src/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-mysql-session": "^3.0.0",
     "express-session": "^1.17.3",
     "mysql": "^2.18.1",
     "nodemon": "^3.0.1",

@@ -43,7 +43,13 @@
         </button>
       </form>
     </div>
-
+    <div class="form__set-name">
+      <h2>현재 이름 : <span id="username"></span></h2>
+      <form onsubmit="setName(event)">
+        <input type="text" class="input__name" />
+        <button type="submit" class="btn__set-name">이름 설정</button>
+      </form>
+    </div>
     <script
       language="javascript"
       type="text/javascript"
@@ -62,6 +68,12 @@
       }
     </script>
     <script>
+      function setName(event) {
+        event.preventDefault();
+        const name = document.querySelector(".input__name").value;
+        socket.emit("set_name", { name: name });
+      }
+
       function send_message(event) {
         event.preventDefault();
         var msg = msgInput.value;

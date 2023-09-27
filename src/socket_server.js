@@ -1,5 +1,5 @@
 const { formatMessage } = require("./utils.js");
-const httpServer = require("./app.js");
+const { httpServer, sessionMiddleware } = require("./app.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {
@@ -8,32 +8,61 @@ let io = require("socket.io")(httpServer, {
   },
 });
 
+io.engine.use(sessionMiddleware);
+
 const room = io.of("/rooms");
 const lobby = io.of("/lobby");
 
 room.on("connection", (socket) => {
-  socket.data.username = "anonymous";
-  console.log("we have a new client" + socket.id);
-  socket.broadcast.emit("message", {
-    msg: formatMessage("server", `${socket.data.username} has joined the game`),
+  socket.use((__, next) => {
+    socket.request.session.reload((err) => {
+      if (err) {
+        socket.disconnect();
+      } else {
+        next();
+      }
+    });
   });
+
+  let session = socket.request.session;
+  if (!session.username) session.username = "anonymous";
+  console.log("we have a new client  " + session.username, session.id);
+
+  socket.broadcast.emit("message", {
+    msg: formatMessage("server", `${session.username}님이 방에 들어왔어요`),
+  });
+
+  socket.emit("set_name", { name: session.username });
+
   socket.emit("message", {
     msg: formatMessage("server", "어서오세용"),
   });
 
+  socket.on("set_name", (data) => {
+    let beforeName = session.username;
+    console.log("set name", data.name);
+    session.username = data.name;
+    session.save();
+    socket.emit("set_name", { name: session.username });
+
+    room.emit("message", {
+      msg: formatMessage(
+        `server`,
+        `${beforeName}님이 이름을 ${data.name}으로 변경하셨어요`
+      ),
+    });
+  });
+
   socket.on("send_msg", (data) => {
     room.emit("message", {
-      msg: formatMessage(`${socket.data.username}`, data.msg),
+      msg: formatMessage(`${session.username}`, data.msg),
     });
   });
 
   socket.on("disconnect", () => {
     console.log("socket disconnected");
     room.emit("message", {
-      msg: formatMessage(
-        "server",
-        `${socket.data.username} has leaved the game`
-      ),
+      msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),
     });
   });
 

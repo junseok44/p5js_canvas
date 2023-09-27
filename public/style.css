@@ -23,6 +23,12 @@ body {
   border: 2px solid black;
 }
 
+.chatting__messages {
+  height: 10rem;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
 #red {
   background-color: red;
 }

@@ -73,11 +73,11 @@
         colorItems.forEach((item) => {
           item.classList.remove("selected");
         });
-        stroke(255);
+        changeStrokeColor(255);
       }
 
       function setPaint() {
-        stroke(0);
+        changeStrokeColor(0);
         // cursor("https://avatars0.githubusercontent.com/u/1617169?s=16");
       }
 
@@ -94,6 +94,11 @@
         strokeWeight(e.target.value);
         cursorWidth = e.target.value;
       }
+
+      function changeStrokeColor(color) {
+        stroke(color);
+        paintColor = color;
+      }
     </script>
     <script>
       const colorItems = document.querySelectorAll(".color__item");
@@ -103,7 +108,7 @@
             item.classList.remove("selected");
           });
           e.target.classList.add("selected");
-          stroke(e.target.id);
+          changeStrokeColor(e.target.id);
         });
       });
     </script>

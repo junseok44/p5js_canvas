@@ -6,8 +6,12 @@ socket.on("message", (data) => {
   msgContainer.appendChild(node);
 });
 
-socket.on("mouse", function (data) {
+socket.on("paint", function (data) {
+  push();
+  stroke(data.paintColor);
+  strokeWeight(data.cursorWidth);
   line(data.prevX, data.prevY, data.x, data.y);
+  pop();
 });
 
 socket.on("reset", () => {

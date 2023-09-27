@@ -1,7 +1,12 @@
 const { formatMessage } = require("./utils.js");
 const httpServer = require("./app.js");
 
-let io = require("socket.io")(httpServer);
+let io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
 const room = io.of("/rooms");
 const lobby = io.of("/lobby");
@@ -30,8 +35,8 @@ room.on("connection", (socket) => {
     });
   });
 
-  socket.on("mouse", function (data) {
-    socket.broadcast.emit("mouse", data);
+  socket.on("paint", function (data) {
+    socket.broadcast.emit("paint", data);
   });
 
   socket.on("reset", function (data) {
@@ -40,5 +45,12 @@ room.on("connection", (socket) => {
 });
 
 lobby.on("connection", (socket) => {
-  socket.emit("show rooms");
+  console.log("connected on lobby");
+  socket.emit("update rooms", () => {
+    // TODO database에서 방 정보 불러서 클라이언트에게 전달하기.
+  });
+
+  socket.on("create_room", () => {});
+
+  socket.on("delete_room", () => {});
 });

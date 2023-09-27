@@ -1,5 +1,6 @@
+require("dotenv").config();
 const httpServer = require("./app");
-
+require("./db.js");
 require("./socket_server");
 
 httpServer.listen(8080, () => {

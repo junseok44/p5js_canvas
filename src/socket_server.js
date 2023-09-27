@@ -14,12 +14,14 @@ const lobby = io.of("/lobby");
 room.on("connection", (socket) => {
   socket.data.username = "anonymous";
   console.log("we have a new client" + socket.id);
+  socket.broadcast.emit("message", {
+    msg: formatMessage("server", `${socket.data.username} has joined the game`),
+  });
   socket.emit("message", {
     msg: formatMessage("server", "어서오세용"),
   });
 
   socket.on("send_msg", (data) => {
-    console.log("received");
     room.emit("message", {
       msg: formatMessage(`${socket.data.username}`, data.msg),
     });
@@ -45,7 +47,7 @@ room.on("connection", (socket) => {
 });
 
 lobby.on("connection", (socket) => {
-  console.log("connected on lobby");
+  console.log("someone is on lobby");
   socket.emit("update rooms", () => {
     // TODO database에서 방 정보 불러서 클라이언트에게 전달하기.
   });

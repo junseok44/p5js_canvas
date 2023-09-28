@@ -1,12 +1,7 @@
 const { formatMessage } = require("./utils.js");
-const { httpServer, sessionMiddleware } = require("./app.js");
-const {
-  getAllRoomsQuery,
-  createRoomQuery,
-  createRoom,
-  getAllRooms,
-  getRoom,
-} = require("./query/roomQuery.js");
+const { httpServer } = require("./app.js");
+const sessionMiddleware = require("./session.js");
+const { createRoom, getAllRooms, getRoom } = require("./query/roomQuery.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {

@@ -10,10 +10,4 @@ var connection = mysql.createConnection({
 connection.connect();
 console.log("connected to mySQL");
 
-// connection.query("SELECT * FROM book", function (error, results, fields) {
-//   if (error) throw error;
-
-//   console.log("The solution is: ", results[0].title);
-// });
-
 module.exports = connection;

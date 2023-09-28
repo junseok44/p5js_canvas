@@ -30,7 +30,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  console.log(req.session.count);
+  req.session.count++;
   res.sendFile(path.join(__dirname, "../public/home.html"));
 });
 

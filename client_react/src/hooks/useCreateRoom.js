@@ -16,6 +16,7 @@ const useCreateRoom = () => {
   const submitForm = () => {
     setIsRoomCreateModal(false);
 
+    //TODO 여기서 Room validate해줘야 한다.
     if (roomForm.roomTitle == "" || roomForm.roomTitle.length > 15) return;
 
     // 여기서 이제 쿼리를 보낸다.

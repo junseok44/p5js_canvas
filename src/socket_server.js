@@ -1,7 +1,12 @@
 const { formatMessage } = require("./utils.js");
 const { httpServer, sessionMiddleware } = require("./app.js");
-const connection = require("./db.js");
-const { getAllRoomsQuery } = require("./query/roomQuery.js");
+const {
+  getAllRoomsQuery,
+  createRoomQuery,
+  createRoom,
+  getAllRooms,
+  getRoom,
+} = require("./query/roomQuery.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {
@@ -81,13 +86,19 @@ room.on("connection", (socket) => {
 lobby.on("connection", (socket) => {
   console.log("someone is on lobby");
 
-  connection.query(getAllRoomsQuery, (err, result, fields) => {
-    if (err) throw err;
+  getAllRooms().then((result) => {
     socket.emit("update_rooms", result);
   });
 
-  socket.on("create_room", (data) => {
-    console.log(data);
+  socket.on("create_room", async (data) => {
+    const result = await createRoom(
+      data.roomTitle,
+      data.roomMax,
+      data.roomPublic
+    );
+
+    const newRoom = await getRoom(result.insertId);
+    lobby.emit("create_room", newRoom);
   });
 
   socket.on("delete_room", () => {});

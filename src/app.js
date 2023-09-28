@@ -17,7 +17,7 @@ const sessionMiddleware = session({
   secret: "secret",
   store: new MySQLStore(SQLStoreOptions),
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
 });
 
 app.use(sessionMiddleware);
@@ -30,12 +30,11 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  req.session.count++;
   res.sendFile(path.join(__dirname, "../public/home.html"));
 });
 
-app.get("/room", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client_react/build/index2.html"));
+app.get("/lobby", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client_react/build/index.html"));
 });
 
 module.exports = { httpServer, sessionMiddleware };

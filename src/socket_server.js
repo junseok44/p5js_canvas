@@ -1,5 +1,7 @@
 const { formatMessage } = require("./utils.js");
 const { httpServer, sessionMiddleware } = require("./app.js");
+const connection = require("./db.js");
+const { getAllRoomsQuery } = require("./query/roomQuery.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {
@@ -35,7 +37,7 @@ room.on("connection", (socket) => {
   socket.emit("set_name", { name: session.username });
 
   socket.emit("message", {
-    msg: formatMessage("server", "어서오세용"),
+    msg: formatMessage("server", `${session.username} 님 어서오세용`),
   });
 
   socket.on("set_name", (data) => {
@@ -77,8 +79,10 @@ room.on("connection", (socket) => {
 
 lobby.on("connection", (socket) => {
   console.log("someone is on lobby");
-  socket.emit("update rooms", () => {
-    // TODO database에서 방 정보 불러서 클라이언트에게 전달하기.
+
+  connection.query(getAllRoomsQuery, (err, result, fields) => {
+    if (err) throw err;
+    socket.emit("update_rooms", result);
   });
 
   socket.on("create_room", () => {});

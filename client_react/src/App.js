@@ -1,51 +1,65 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
 import Room from "./Components/Room";
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-
-const temp_room_data = [
-  {
-    title: "room1",
-    is_playing: false,
-    current: 1,
-    full: 8,
-  },
-
-  {
-    title: "room2",
-    is_playing: false,
-    current: 1,
-    full: 8,
-  },
-  {
-    title: "room3",
-    is_playing: true,
-    current: 1,
-    full: 8,
-  },
-];
-
-let src = "http://localhost:8080/lobby";
-let socket = io(src);
+import useSocket from "./hooks/useSocket";
+import Modal_createRoom from "./Components/Modal_createRoom";
+import Modal_joinRoom from "./Components/Modal_joinRoom";
+import useCreateRoom from "./hooks/useCreateRoom";
+import useJoinRoom from "./hooks/useJoinRoom";
 
 export default () => {
   const [rooms, setRooms] = useState([]);
-
+  const { connected } = useSocket(setRooms);
+  const {
+    isRoomCreateModal,
+    setIsRoomCreateModal,
+    roomForm,
+    setRoomForm,
+    submitForm,
+  } = useCreateRoom();
+  const { isRoomJoinModal, setIsRoomJoinModal } = useJoinRoom();
   return (
     <div className="App">
-      <h1>정문인과 함께하는 캐치마인드</h1>
+      <h1>정문기입과 함께하는 캐치마인드</h1>
+      <span>{connected ? "온라인" : "오프라인"}</span>
       <h3>ROOMS</h3>
-      <button>방 만들기</button>
-      <button>방 참가하기</button>
-      <div className="room_list">
-        {temp_room_data.map((room) => (
-          <Room
-            title={room.title}
-            current={room.current}
-            isPlaying={room.is_playing}
-            limit={room.full}
-          ></Room>
-        ))}
-      </div>
+      <button onClick={() => setIsRoomCreateModal(!isRoomCreateModal)}>
+        방 만들기
+      </button>
+      <button onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}>
+        방 참가하기
+      </button>
+
+      <ul className="room_list">
+        {rooms.length == 0
+          ? "방이 없습니다"
+          : rooms.map((room) => (
+              <Room
+                key={room.id}
+                title={room.title}
+                current={room.count}
+                isPlaying={room.is_playing}
+                limit={room.maximum}
+              ></Room>
+            ))}
+      </ul>
+
+      {isRoomCreateModal && (
+        <Modal_createRoom
+          onPressCancel={() => setIsRoomCreateModal(false)}
+          onPressConfirm={submitForm}
+          roomForm={roomForm}
+          setRoomForm={setRoomForm}
+        ></Modal_createRoom>
+      )}
+      {isRoomJoinModal && (
+        <Modal_joinRoom
+          onPressCancel={() => setIsRoomJoinModal(false)}
+          onPressConfirm={() => {
+            setIsRoomJoinModal(false);
+          }}
+        ></Modal_joinRoom>
+      )}
     </div>
   );
 };

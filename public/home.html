@@ -72,8 +72,10 @@
     <script>
       function setName(event) {
         event.preventDefault();
-        const name = document.querySelector(".input__name").value;
+        const nameInput = document.querySelector(".input__name");
+        const name = nameInput.value;
         socket.emit("set_name", { name: name });
+        nameInput.value = "";
       }
 
       function send_message(event) {

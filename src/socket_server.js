@@ -19,6 +19,7 @@ room.on("connection", (socket) => {
   socket.use((__, next) => {
     socket.request.session.reload((err) => {
       if (err) {
+        console.log("session reload error", err);
         socket.disconnect();
       } else {
         next();

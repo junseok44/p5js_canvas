@@ -12,8 +12,8 @@ export default () => {
   const { connected } = useSocket(setRooms);
   const {
     isRoomCreateModal,
-    setIsRoomCreateModal,
     roomForm,
+    setIsRoomCreateModal,
     setRoomForm,
     submitForm,
   } = useCreateRoom();

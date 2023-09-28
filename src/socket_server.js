@@ -86,7 +86,9 @@ lobby.on("connection", (socket) => {
     socket.emit("update_rooms", result);
   });
 
-  socket.on("create_room", () => {});
+  socket.on("create_room", (data) => {
+    console.log(data);
+  });
 
   socket.on("delete_room", () => {});
 });

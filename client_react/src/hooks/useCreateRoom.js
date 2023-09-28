@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { socketState } from "../state/socket";
+import { useRecoilValue } from "recoil";
 
 const useCreateRoom = () => {
   const [isRoomCreateModal, setIsRoomCreateModal] = useState(false);
@@ -9,6 +11,7 @@ const useCreateRoom = () => {
     roomPassword: "",
     roomPasswordCheck: "",
   });
+  const socket = useRecoilValue(socketState);
 
   const submitForm = () => {
     setIsRoomCreateModal(false);
@@ -16,6 +19,7 @@ const useCreateRoom = () => {
     if (roomForm.roomTitle == "" || roomForm.roomTitle.length > 15) return;
 
     // 여기서 이제 쿼리를 보낸다.
+    socket.emit("create_room", roomForm);
   };
 
   return {

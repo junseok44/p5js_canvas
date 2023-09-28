@@ -1,5 +1,8 @@
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { socketState } from "../state/socket";
+import { setRecoil } from "recoil-nexus";
 let src = "http://localhost:8080/lobby";
 
 export default (setRooms) => {
@@ -7,6 +10,7 @@ export default (setRooms) => {
 
   useEffect(() => {
     let socket = io(src);
+    setRecoil(socketState, io(src));
 
     socket.on("connect", () => {
       setConnected(true);

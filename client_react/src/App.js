@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Room from "./Components/Room";
 import useSocket from "./hooks/useSocket";
@@ -18,6 +18,7 @@ export default () => {
     submitForm,
   } = useCreateRoom();
   const { isRoomJoinModal, setIsRoomJoinModal } = useJoinRoom();
+
   return (
     <div className="App">
       <h1>정문기입과 함께하는 캐치마인드</h1>
@@ -40,6 +41,7 @@ export default () => {
                 current={room.count}
                 isPlaying={room.is_playing}
                 limit={room.maximum}
+                code={room.roomCode}
               ></Room>
             ))}
       </ul>

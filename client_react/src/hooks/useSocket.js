@@ -1,4 +1,4 @@
-import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
+import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { socketState } from "../state/socket";
 import { setRecoil } from "recoil-nexus";
@@ -9,7 +9,7 @@ export default (setRooms) => {
 
   useEffect(() => {
     let socket = io(src);
-    setRecoil(socketState, io(src));
+    setRecoil(socketState, socket);
 
     socket.on("connect", () => {
       setConnected(true);
@@ -20,10 +20,11 @@ export default (setRooms) => {
     });
 
     socket.on("create_room", (room) => {
-      setRooms((rooms) => [...rooms, room]);
+      setRooms((rooms) => [room, ...rooms]);
     });
 
     socket.on("update_rooms", (data) => {
+      console.log(data);
       setRooms(data);
     });
     return () => socket.disconnect();

@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>캐치마인드 with p5.js</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
   </head>
 
   <body>
     <h1>캐치마인드 with p5.js</h1>
+    <h3>방제목 : <span class="room__name"></span></h3>
     <label for="strokeWeight">크기</label>
     <input
       type="range"
@@ -21,7 +22,9 @@
     <button onclick="setPaint()">펜</button>
     <button onclick="resetCanvas()">리셋하기</button>
     <button onclick="saveImage()">이미지 저장</button>
-
+    <button>
+      <a href="/"> 로비로 나가기 </a>
+    </button>
     <div class="color__palette">
       <div class="color__item" id="red"></div>
       <div class="color__item" id="yellow"></div>
@@ -57,9 +60,9 @@
       type="text/javascript"
       src="/socket.io.js"
     ></script>
-    <script src="p5.min.js"></script>
-    <script src="paint.js"></script>
-    <script src="socket_client.js"></script>
+    <script src="/p5.min.js"></script>
+    <script src="/paint.js"></script>
+    <script src="/socket_client.js"></script>
     <script>
       const msgContainer = document.querySelector(".chatting__messages");
       const msgInput = document.querySelector(".chatting__input");
@@ -68,6 +71,16 @@
         node.innerHTML = msg;
         return node;
       }
+    </script>
+    <script>
+      const roomCode = window.location.pathname.split("/")[2];
+
+      fetch(`/api/room/${roomCode}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const roomName = document.querySelector(".room__name");
+          roomName.innerHTML = data.title;
+        });
     </script>
     <script>
       function setName(event) {

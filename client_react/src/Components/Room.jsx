@@ -1,9 +1,9 @@
 import React from "react";
 
-const Room = ({ title, current, limit, isPlaying }) => {
+const Room = ({ title, current, limit, isPlaying, code }) => {
   return (
     <li>
-      <a href="/room">
+      <a href={`/room/${code}`}>
         <h3>{title}</h3>
         <span>
           {current} / {limit}

@@ -39,7 +39,8 @@ const getRoom = (roomId) => {
   return new Promise((resolve, reject) => {
     connection.query(getRoomQuery(roomId), (err, result) => {
       if (err) reject(err);
-      resolve(result[0]);
+      if (result) resolve(result[0]);
+      else resolve(null);
     });
   });
 };

@@ -20,6 +20,17 @@ socket.on("paint", function (data) {
   pop();
 });
 
+socket.on("update_users", (data) => {
+  const userList = document.querySelector(".all_users");
+  userList.innerHTML = "";
+
+  data.forEach((user) => {
+    const node = document.createElement("li");
+    node.innerHTML = user.username;
+    userList.appendChild(node);
+  });
+});
+
 socket.on("reset", () => {
   clear();
 });

@@ -1,4 +1,4 @@
-const { formatMessage } = require("./utils.js");
+const { formatMessage, getRoomCodeFromUrl } = require("./utils.js");
 const { httpServer } = require("./app.js");
 const sessionMiddleware = require("./session.js");
 const { createRoom, getAllRooms, getRoom } = require("./query/roomQuery.js");
@@ -15,6 +15,8 @@ io.engine.use(sessionMiddleware);
 const room = io.of("/rooms");
 const lobby = io.of("/lobby");
 
+let roomCodetoSessionMap = new Map();
+
 room.on("connection", (socket) => {
   socket.use((__, next) => {
     socket.request.session.reload((err) => {
@@ -27,28 +29,30 @@ room.on("connection", (socket) => {
     });
   });
 
-  const req = socket.request;
-  const {
-    headers: { referer },
-  } = req;
-
-  let urlParts = referer.split("/");
-  let roomCode = urlParts[urlParts.length - 1];
-
+  const roomCode = getRoomCodeFromUrl(socket);
   socket.join(roomCode);
-  let session = socket.request.session;
-  if (!session.username) session.username = "anonymous";
-  console.log("we have a new client  " + session.username, session.id);
+
+  const session = socket.request.session;
+  const username = session.username || "anonymous";
+
+  if (roomCodetoSessionMap.has(roomCode)) {
+    roomCodetoSessionMap.get(roomCode).push(session);
+  } else {
+    roomCodetoSessionMap.set(roomCode, [session]);
+  }
+
+  room.to(roomCode).emit("update_users", roomCodetoSessionMap.get(roomCode));
+
+  console.log(roomCodetoSessionMap);
 
   socket.to(roomCode).emit("message", {
-    msg: formatMessage("server", `${session.username}님이 방에 들어왔어요`),
+    msg: formatMessage("server", `${username}님이 방에 들어왔어요`),
   });
 
-  // 세션의 username 기억한것을 전달해준다.
-  socket.emit("set_name", { name: session.username });
+  socket.emit("set_name", { name: username });
 
   socket.emit("message", {
-    msg: formatMessage("server", `${session.username} 님 어서오세용`),
+    msg: formatMessage("server", `${username} 님 어서오세용`),
   });
 
   socket.on("set_name", (data) => {
@@ -74,6 +78,12 @@ room.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("socket disconnected");
     socket.leave(roomCode);
+    roomCodetoSessionMap.set(
+      roomCode,
+      roomCodetoSessionMap.get(roomCode).filter((s) => s.id !== session.id)
+    );
+    room.to(roomCode).emit("update_users", roomCodetoSessionMap.get(roomCode));
+
     room.to(roomCode).emit("message", {
       msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),
     });

@@ -1,10 +1,11 @@
 let socket = io("/rooms");
 
-socket.on("message", (data) => {
-  const node = createMessageNode(data.msg);
-  msgContainer.appendChild(node);
+socket.on("alert", (data) => {
+  alert(data.msg);
+});
 
-  msgContainer.scrollTop = msgContainer.scrollHeight;
+socket.on("message", (data) => {
+  createMessageAndShow(data.msg, data.type);
 });
 
 socket.on("set_name", (data) => {
@@ -34,3 +35,12 @@ socket.on("update_users", (data) => {
 socket.on("reset", () => {
   clear();
 });
+
+socket.on("game_start", (data) => {
+  alert("게임을 시작합니다.");
+  createMessageAndShow(data.msg, data.type);
+});
+
+socket.on("game_disable_canvas", () => {});
+
+socket.on("game_reable_canvas", () => {});

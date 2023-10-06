@@ -2,6 +2,7 @@ const { formatMessage, getRoomCodeFromUrl } = require("./utils.js");
 const { httpServer } = require("./app.js");
 const sessionMiddleware = require("./session.js");
 const { createRoom, getAllRooms, getRoom } = require("./query/roomQuery.js");
+const CatchMindGame = require("./game.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {
@@ -16,6 +17,7 @@ const room = io.of("/rooms");
 const lobby = io.of("/lobby");
 
 let roomCodetoSessionMap = new Map();
+let roomCodeToGameMap = new Map();
 
 room.on("connection", (socket) => {
   socket.use((__, next) => {
@@ -33,7 +35,8 @@ room.on("connection", (socket) => {
   socket.join(roomCode);
 
   const session = socket.request.session;
-  const username = session.username || "anonymous";
+  session.username = session.username || "Guest";
+  const username = session.username;
 
   if (roomCodetoSessionMap.has(roomCode)) {
     roomCodetoSessionMap.get(roomCode).push(session);
@@ -43,16 +46,26 @@ room.on("connection", (socket) => {
 
   room.to(roomCode).emit("update_users", roomCodetoSessionMap.get(roomCode));
 
-  console.log(roomCodetoSessionMap);
-
   socket.to(roomCode).emit("message", {
     msg: formatMessage("server", `${username}님이 방에 들어왔어요`),
+    type: "system",
   });
 
   socket.emit("set_name", { name: username });
 
   socket.emit("message", {
     msg: formatMessage("server", `${username} 님 어서오세용`),
+    type: "system",
+  });
+
+  socket.on("start_game", () => {
+    console.log(roomCodeToGameMap);
+    if (roomCodeToGameMap.get(roomCode)) {
+      socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
+      return;
+    }
+    new CatchMindGame(room, roomCode, socket, roomCodeToGameMap).startGame();
+    roomCodeToGameMap.set(roomCode, true);
   });
 
   socket.on("set_name", (data) => {
@@ -66,7 +79,9 @@ room.on("connection", (socket) => {
         `server`,
         `${beforeName}님이 이름을 ${data.name}으로 변경하셨어요`
       ),
+      type: "system",
     });
+    room.to(roomCode).emit("update_users", roomCodetoSessionMap.get(roomCode));
   });
 
   socket.on("send_msg", (data) => {
@@ -86,6 +101,7 @@ room.on("connection", (socket) => {
 
     room.to(roomCode).emit("message", {
       msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),
+      type: "system",
     });
   });
 

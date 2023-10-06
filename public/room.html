@@ -8,70 +8,97 @@
   </head>
 
   <body>
-    <h1>캐치마인드 with p5.js</h1>
+    <h1>
+      캐치마인드 with p5.js
+
+      <button>
+        <a href="/"> 로비로 나가기 </a>
+      </button>
+    </h1>
     <h2>방제목 : <span class="room__name"></span></h2>
-    <label for="strokeWeight">크기</label>
-    <input
-      type="range"
-      max="20"
-      min="1"
-      id="strokeWeight"
-      onchange="onChangeStrokeWeight(event)"
-    />
-    <button onclick="setEraser()">지우개</button>
-    <button onclick="setPaint()">펜</button>
-    <button onclick="resetCanvas()">리셋하기</button>
-    <button onclick="saveImage()">이미지 저장</button>
-    <button>
-      <a href="/"> 로비로 나가기 </a>
-    </button>
-    <div class="color__palette">
-      <div class="color__item" id="red"></div>
-      <div class="color__item" id="yellow"></div>
-      <div class="color__item" id="green"></div>
-      <div class="color__item" id="orange"></div>
-      <div class="color__item" id="pink"></div>
+
+    <div class="chat__container">
+      <div class="chatting__box">
+        <div class="chatting__messages"></div>
+        <form class="chatting__form" onsubmit="send_message(event)">
+          <input type="text" class="chatting__input" />
+          <button
+            type="submit"
+            class="chatting__submit"
+            onclick="send_message(event)"
+          >
+            전송
+          </button>
+          <label for="answerCheck">정답 입력</label>
+          <input type="checkbox" id="answerCheck" />
+        </form>
+      </div>
+      <div class="user_container">
+        <h2>현재 접속자</h2>
+        <ul class="all_users"></ul>
+      </div>
+      <div class="form__set-name">
+        <h2>현재 이름 : <span id="username"></span></h2>
+        <form onsubmit="setName(event)">
+          <input type="text" class="input__name" />
+          <button type="submit" class="btn__set-name">이름 설정</button>
+        </form>
+      </div>
+    </div>
+    <div class="canvas__controller">
+      <label for="strokeWeight">크기</label>
+      <input
+        type="range"
+        max="20"
+        min="1"
+        id="strokeWeight"
+        onchange="onChangeStrokeWeight(event)"
+      />
+      <button onclick="setEraser()">지우개</button>
+      <button onclick="setPaint()">펜</button>
+      <button onclick="resetCanvas()">리셋하기</button>
+      <button onclick="startGame()">게임 시작하기</button>
+
+      <div class="color__palette">
+        <div class="color__item" id="red"></div>
+        <div class="color__item" id="yellow"></div>
+        <div class="color__item" id="green"></div>
+        <div class="color__item" id="orange"></div>
+        <div class="color__item" id="pink"></div>
+      </div>
     </div>
 
-    <div class="chatting__box">
-      <div class="chatting__messages"></div>
-      <form class="chatting__form" onsubmit="send_message(event)">
-        <input type="text" class="chatting__input" />
-        <button
-          type="submit"
-          class="chatting__submit"
-          onclick="send_message(event)"
-        >
-          전송
-        </button>
-        <label for="answerCheck">정답 입력</label>
-        <input type="checkbox" id="answerCheck" />
-      </form>
-    </div>
-    <div class="user_container">
-      <h2>현재 접속자</h2>
-      <ul class="all_users"></ul>
-    </div>
-    <div class="form__set-name">
-      <h2>현재 이름 : <span id="username"></span></h2>
-      <form onsubmit="setName(event)">
-        <input type="text" class="input__name" />
-        <button type="submit" class="btn__set-name">이름 설정</button>
-      </form>
-    </div>
     <script
       language="javascript"
       type="text/javascript"
       src="/socket.io.js"
     ></script>
     <script src="/p5.min.js"></script>
+
     <script src="/paint.js"></script>
     <script src="/socket_client.js"></script>
+    <script src="/game_client.js"></script>
     <script>
       const msgContainer = document.querySelector(".chatting__messages");
       const msgInput = document.querySelector(".chatting__input");
-      function createMessageNode(msg) {
+      const isAnswerCheck = document.querySelector("#answerCheck");
+
+      function createMessageAndShow(msg, type) {
+        const node = createMessageNode(msg, type);
+        msgContainer.appendChild(node);
+
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }
+
+      function createMessageNode(msg, type) {
         let node = document.createElement("div");
+        if (type === "system") {
+          node.classList.add("system__message");
+        } else if (type === "fail") {
+          node.classList.add("fail__message");
+        } else if (type === "success") {
+          node.classList.add("success__message");
+        }
         node.innerHTML = msg;
         return node;
       }
@@ -98,7 +125,10 @@
       function send_message(event) {
         event.preventDefault();
         var msg = msgInput.value;
-        socket.emit("send_msg", { msg: msg });
+        isAnswerCheck.checked
+          ? socket.emit("send_answer", { answer: msg })
+          : socket.emit("send_msg", { msg: msg });
+
         msgInput.value = "";
       }
 
@@ -117,6 +147,10 @@
       function resetCanvas() {
         clear();
         socket.emit("reset");
+      }
+
+      function startGame() {
+        socket.emit("start_game");
       }
 
       function saveImage() {

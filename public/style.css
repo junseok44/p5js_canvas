@@ -8,6 +8,24 @@ body {
   border: 1px solid black;
 }
 
+.chat__container {
+  display: flex;
+}
+
+.system__message {
+  font-weight: 800;
+}
+
+.fail__message {
+  font-weight: 700;
+  color: red;
+}
+
+.success__message {
+  font-weight: 700;
+  color: green;
+}
+
 .color__palette {
   display: flex;
 }

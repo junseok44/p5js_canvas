@@ -3,6 +3,7 @@ let prevX = 0;
 let prevY = 0;
 let cursorWidth = 5;
 let paintColor = 0;
+let isDisabled = false;
 
 function setup() {
   canvas1 = createCanvas(1200, 400);
@@ -13,15 +14,8 @@ function setup() {
 }
 
 function draw() {
-  if (mouseIsPressed) {
+  if (mouseIsPressed && !isDisabled) {
     line(prevX, prevY, mouseX, mouseY);
-  }
-  prevX = mouseX;
-  prevY = mouseY;
-}
-
-function mouseDragged() {
-  if (mouseIsPressed) {
     let data = {
       x: mouseX,
       y: mouseY,
@@ -31,5 +25,12 @@ function mouseDragged() {
       paintColor,
     };
     socket.emit("paint", data);
+  }
+  prevX = mouseX;
+  prevY = mouseY;
+}
+
+function mouseDragged() {
+  if (mouseIsPressed) {
   }
 }

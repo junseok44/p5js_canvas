@@ -41,6 +41,12 @@ socket.on("game_start", (data) => {
   createMessageAndShow(data.msg, data.type);
 });
 
-socket.on("game_disable_canvas", () => {});
+socket.on("game_disable_canvas", () => {
+  isDisabled = true;
+  canvas1.style.opacity = 0.7;
+});
 
-socket.on("game_reable_canvas", () => {});
+socket.on("game_reable_canvas", () => {
+  isDisabled = false;
+  canvas1.style.opacity = 1;
+});

@@ -39,7 +39,7 @@ class CatchMindGame {
       ),
       type: "system",
     });
-    this.host.broadcast.emit("disable_canvas");
+    this.host.broadcast.emit("game_disable_canvas");
     setTimeout(() => {
       this.answerPhase();
     }, drawPhaseTime);

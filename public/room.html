@@ -9,16 +9,15 @@
 
   <body>
     <h1>
-      캐치마인드 with p5.js
+      <span>방제목 : <span class="room__name"></span></span>
 
       <button>
         <a href="/"> 로비로 나가기 </a>
       </button>
     </h1>
-    <h2>방제목 : <span class="room__name"></span></h2>
 
     <div class="chat__container">
-      <div class="chatting__box">
+      <div class="chatting__box item">
         <div class="chatting__messages"></div>
         <form class="chatting__form" onsubmit="send_message(event)">
           <input type="text" class="chatting__input" />
@@ -33,11 +32,11 @@
           <input type="checkbox" id="answerCheck" />
         </form>
       </div>
-      <div class="user_container">
+      <div class="user_container item">
         <h2>현재 접속자</h2>
         <ul class="all_users"></ul>
       </div>
-      <div class="form__set-name">
+      <div class="form__set-name item">
         <h2>현재 이름 : <span id="username"></span></h2>
         <form onsubmit="setName(event)">
           <input type="text" class="input__name" />

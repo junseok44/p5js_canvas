@@ -59,7 +59,6 @@ room.on("connection", (socket) => {
   });
 
   socket.on("start_game", () => {
-    console.log(roomCodeToGameMap);
     if (roomCodeToGameMap.get(roomCode)) {
       socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
       return;

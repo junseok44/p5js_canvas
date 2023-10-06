@@ -9,6 +9,17 @@ const question_words = [
   "연장전",
   "퇴학",
   "가수",
+  "냅킨",
+  "단감",
+  "단도",
+  "동맥",
+  "단백질",
+  "단추",
+  "방귀",
+  "보리",
+  "단풍",
+  "달걀",
+  "사막",
 ];
 
 const drawPhaseTime = 20000;
@@ -45,7 +56,7 @@ class CatchMindGame {
     }, drawPhaseTime);
   }
 
-  answerPhase() {
+  async answerPhase() {
     this.room.to(this.roomCode).emit("game_disable_canvas");
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
@@ -65,23 +76,31 @@ class CatchMindGame {
       this.endGame();
     }, answerPhaseTime);
 
-    this.host.on("send_answer", (data) => {
-      if (this.validateAnswer(data.answer)) {
-        clearTimeout(answerTimer);
-        this.room.to(this.roomCode).emit("message", {
-          msg: formatMessage(
-            "system",
-            `${this.host.request.session.username}님이 정답을 맞추셨습니다!!`
-          ),
-          type: "success",
-        });
-        this.calculateScoreStep();
-      } else {
-        this.room.to(this.roomCode).emit("message", {
-          msg: formatMessage("system", `${data.answer}는 오답입니다!!`),
-          type: "fail",
-        });
-      }
+    const sockets = await this.room.in(this.roomCode).fetchSockets();
+
+    sockets.forEach((socket) => {
+      // if (socket.id == this.host.id) {
+      //   return;
+      // }
+
+      socket.on("send_answer", (data) => {
+        if (this.validateAnswer(data.answer)) {
+          clearTimeout(answerTimer);
+          this.room.to(this.roomCode).emit("message", {
+            msg: formatMessage(
+              "system",
+              `${socket.request.session.username}님이 정답을 맞추셨습니다!! 정답은 ${this.answer}였어요`
+            ),
+            type: "success",
+          });
+          this.calculateScoreStep();
+        } else {
+          this.room.to(this.roomCode).emit("message", {
+            msg: formatMessage("system", `${data.answer}는 오답입니다!!`),
+            type: "fail",
+          });
+        }
+      });
     });
   }
 
@@ -107,12 +126,19 @@ class CatchMindGame {
       msg: formatMessage("System", "게임을 시작합니다."),
       type: "system",
     });
+    this.room.to(this.roomCode).emit("reset");
     this.drawPhase();
   }
 
-  endGame() {
+  async endGame() {
     this.room.to(this.roomCode).emit("game_reable_canvas");
-    this.host.removeAllListeners("send_answer");
+
+    const sockets = await this.room.in(this.roomCode).fetchSockets();
+
+    sockets.forEach((socket) => {
+      socket.removeAllListeners("send_answer");
+    });
+
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage("System", "게임이 종료되었습니다. 다들 안녕~~"),
       type: "system",

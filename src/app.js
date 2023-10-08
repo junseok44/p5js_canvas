@@ -18,8 +18,15 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client_react/build/index.html"));
 });
 
-app.get("/room/:code", (req, res) => {
+app.get("/room/:code", async (req, res) => {
   req.session.count++;
+
+  try {
+    const room = await getRoomByCode(req.params.code);
+    if (!room) return res.status(404).send("해당하는 룸이 없어요");
+  } catch (error) {
+    return next(error);
+  }
   res.sendFile(path.join(__dirname, "../public/room.html"));
 });
 

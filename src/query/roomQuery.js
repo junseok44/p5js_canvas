@@ -1,6 +1,6 @@
 const connection = require("../db.js");
 
-const getAllRoomsQuery = "SELECT * FROM rooms;";
+const getAllRoomsQuery = "SELECT * FROM rooms ORDER BY id DESC;";
 
 const updateRoomQuery = (id, increment, isStarted) => {
   const queries = [];

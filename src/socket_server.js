@@ -147,7 +147,8 @@ room.on("connection", (socket) => {
         } else {
           lobby.emit("update_room", room);
         }
-      });
+      })
+      .catch((err) => console.log(err));
 
     socket.leave(roomCode);
 

@@ -17,7 +17,13 @@ export default () => {
     setRoomForm,
     submitForm,
   } = useCreateRoom();
-  const { isRoomJoinModal, setIsRoomJoinModal } = useJoinRoom();
+  const {
+    isRoomJoinModal,
+    roomCode,
+    setIsRoomJoinModal,
+    joinRoom,
+    setRoomCode,
+  } = useJoinRoom();
 
   return (
     <div className="App">
@@ -57,7 +63,10 @@ export default () => {
       {isRoomJoinModal && (
         <Modal_joinRoom
           onPressCancel={() => setIsRoomJoinModal(false)}
+          roomCode={roomCode}
+          setRoomCode={setRoomCode}
           onPressConfirm={() => {
+            joinRoom(roomCode);
             setIsRoomJoinModal(false);
           }}
         ></Modal_joinRoom>

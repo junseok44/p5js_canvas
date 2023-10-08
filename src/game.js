@@ -23,8 +23,8 @@ const question_words = [
   "사막",
 ];
 
-const drawPhaseTime = 5000;
-const answerPhaseTime = 5000;
+const drawPhaseTime = 20000;
+const answerPhaseTime = 20000;
 
 class CatchMindGame {
   // 룸정보와, 게임을 시작한 host 정보가 있어야 하고.

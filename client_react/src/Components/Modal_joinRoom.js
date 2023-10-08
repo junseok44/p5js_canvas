@@ -2,12 +2,24 @@ import React from "react";
 import Modal_content from "./Modal_content";
 import Modal_overlay from "./Modal_overlay";
 import Box from "./Box";
-const Modal_joinRoom = ({ onPressCancel, onPressConfirm }) => {
+const Modal_joinRoom = ({
+  onPressCancel,
+  onPressConfirm,
+  roomCode,
+  setRoomCode,
+}) => {
   return (
     <Modal_overlay>
       <Modal_content>
         <h1>방 참가하기</h1>
-        <input type="text" placeholder="방 초대코드" />
+        <input
+          type="text"
+          placeholder="방 초대코드"
+          value={roomCode}
+          onChange={(e) => {
+            setRoomCode(e.target.value);
+          }}
+        />
 
         <Box>
           <button onClick={onPressCancel}>취소</button>

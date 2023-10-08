@@ -39,7 +39,7 @@ export default () => {
                 key={room.id}
                 title={room.title}
                 current={room.count}
-                isPlaying={room.is_playing}
+                isStarted={room.isStarted}
                 limit={room.maximum}
                 code={room.roomCode}
               ></Room>

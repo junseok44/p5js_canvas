@@ -30,7 +30,14 @@ function draw() {
   prevY = mouseY;
 }
 
-function mouseDragged() {
-  if (mouseIsPressed) {
-  }
+function disableCanvas() {
+  isDisabled = true;
+  canvas1.style.opacity = 0.7;
+  cursor(WAIT);
+}
+
+function reableCanvas() {
+  isDisabled = false;
+  canvas1.style.opacity = 1;
+  cursor(ARROW);
 }

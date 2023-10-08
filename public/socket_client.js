@@ -24,12 +24,44 @@ socket.on("paint", function (data) {
 socket.on("update_users", (data) => {
   const userList = document.querySelector(".all_users");
   userList.innerHTML = "";
-
   data.forEach((user) => {
     const node = document.createElement("li");
     node.innerHTML = user.username;
     userList.appendChild(node);
   });
+});
+
+socket.on("update_room_status", (data) => {
+  switch (data.status) {
+    case "waiting":
+      changeGameStatus(waitingPhase);
+      setTimer(waitingPhase, data.time);
+      break;
+    case "drawing":
+      changeGameStatus(drawPhase);
+      setTimer(drawPhase, data.time);
+      break;
+    case "answer":
+      changeGameStatus(answerPhase);
+      setTimer(answerPhase, data.time);
+      break;
+    default:
+      changeGameStatus(waitingPhase);
+      break;
+  }
+});
+
+socket.on("game_time", (data) => {
+  switch (data.status) {
+    case "drawing":
+      setTimer(drawPhase, data.time);
+      break;
+    case "answer":
+      setTimer(answerPhase, data.time);
+      break;
+    default:
+      break;
+  }
 });
 
 socket.on("reset", () => {
@@ -41,12 +73,22 @@ socket.on("game_start", (data) => {
   createMessageAndShow(data.msg, data.type);
 });
 
+socket.on("game_drawPhase", (data) => {
+  changeGameStatus(drawPhase);
+});
+
+socket.on("game_answerPhase", (data) => {
+  changeGameStatus(answerPhase);
+});
+
+socket.on("game_end", (data) => {
+  changeGameStatus(waitingPhase);
+});
+
 socket.on("game_disable_canvas", () => {
-  isDisabled = true;
-  canvas1.style.opacity = 0.7;
+  disableCanvas();
 });
 
 socket.on("game_reable_canvas", () => {
-  isDisabled = false;
-  canvas1.style.opacity = 1;
+  reableCanvas();
 });

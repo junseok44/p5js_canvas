@@ -2,8 +2,26 @@ const connection = require("../db.js");
 
 const getAllRoomsQuery = "SELECT * FROM rooms;";
 
+const updateRoomQuery = (id, increment, isStarted) => {
+  const queries = [];
+
+  if (increment !== undefined && increment !== null) {
+    queries.push(`count = count + ${increment}`);
+  }
+
+  if (isStarted !== undefined && isStarted !== null) {
+    queries.push(`isStarted = ${isStarted}`);
+  }
+
+  return `UPDATE rooms SET ${queries} WHERE roomCode = '${id}'`;
+};
+
 const getRoomQuery = (id) => {
-  return `SELECT * FROM rooms WHERE id = ${id}`;
+  return `SELECT * FROM rooms WHERE id = '${id}'`;
+};
+
+const deleteRoomQuery = (id) => {
+  return `DELETE FROM rooms WHERE roomCode = '${id}'`;
 };
 
 const getRoomQueryByCode = (roodCode) => {
@@ -12,6 +30,27 @@ const getRoomQueryByCode = (roodCode) => {
 
 const createRoomQuery = (title, maximum, is_public) => {
   return `INSERT INTO rooms (title, maximum, isPublic) VALUES ('${title}', ${maximum}, ${is_public});`;
+};
+
+const deleteRoom = (id) => {
+  return new Promise((resolve, reject) => {
+    connection.query(deleteRoomQuery(id), (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+};
+
+const updateRoom = (id, increment, isStarted) => {
+  return new Promise((resolve, reject) => {
+    connection.query(
+      updateRoomQuery(id, increment, isStarted),
+      (err, result) => {
+        if (err) reject(err);
+        resolve(result);
+      }
+    );
+  });
 };
 
 const getAllRooms = () => {
@@ -60,6 +99,8 @@ module.exports = {
   createRoomQuery,
   getAllRooms,
   createRoom,
+  updateRoom,
+  deleteRoom,
   getRoom,
   getRoomByCode,
 };

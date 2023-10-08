@@ -1,3 +1,4 @@
+const { updateRoom, getRoomByCode } = require("./query/roomQuery");
 const { formatMessage } = require("./utils");
 
 const question_words = [
@@ -22,13 +23,14 @@ const question_words = [
   "사막",
 ];
 
-const drawPhaseTime = 20000;
-const answerPhaseTime = 20000;
+const drawPhaseTime = 5000;
+const answerPhaseTime = 5000;
 
 class CatchMindGame {
   // 룸정보와, 게임을 시작한 host 정보가 있어야 하고.
-  constructor(room, roomCode, socket, map) {
+  constructor(room, roomCode, socket, map, lobby) {
     this.room = room;
+    this.lobby = lobby;
     this.roomCode = roomCode;
     this.host = socket;
     this.answer = "";
@@ -36,8 +38,26 @@ class CatchMindGame {
   }
 
   drawPhase() {
+    this.roomCodeToGameMap.set(this.roomCode, {
+      ...this.roomCodeToGameMap.get(this.roomCode),
+      status: "drawing",
+    });
+
+    updateRoom(this.roomCode, null, true)
+      .then((res) => {
+        return getRoomByCode(this.roomCode);
+      })
+      .then((room) => {
+        this.lobby.emit("update_room", room);
+      });
+
+    this.room.to(this.roomCode).emit("game_drawPhase");
+
+    this.startRoomTimer(drawPhaseTime / 1000);
+
     this.answer =
       question_words[Math.floor(Math.random() * question_words.length)];
+
     this.host.emit("alert", {
       msg: `당신이 그릴 단어는 ${this.answer}입니다. ${
         drawPhaseTime / 1000
@@ -51,12 +71,22 @@ class CatchMindGame {
       type: "system",
     });
     this.host.broadcast.emit("game_disable_canvas");
+
     setTimeout(() => {
       this.answerPhase();
     }, drawPhaseTime);
   }
 
   async answerPhase() {
+    this.roomCodeToGameMap.set(this.roomCode, {
+      ...this.roomCodeToGameMap.get(this.roomCode),
+      status: "answer",
+    });
+
+    this.room.to(this.roomCode).emit("game_answerPhase");
+
+    this.startRoomTimer(answerPhaseTime / 1000);
+
     this.room.to(this.roomCode).emit("game_disable_canvas");
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
@@ -79,10 +109,6 @@ class CatchMindGame {
     const sockets = await this.room.in(this.roomCode).fetchSockets();
 
     sockets.forEach((socket) => {
-      // if (socket.id == this.host.id) {
-      //   return;
-      // }
-
       socket.on("send_answer", (data) => {
         if (this.validateAnswer(data.answer)) {
           clearTimeout(answerTimer);
@@ -102,6 +128,29 @@ class CatchMindGame {
         }
       });
     });
+  }
+
+  startRoomTimer(time) {
+    // time초동안 1초마다 room의 time을 1씩 줄여주고, 0이되면 clearInterval
+
+    let timer = setInterval(() => {
+      time -= 1;
+
+      this.roomCodeToGameMap.set(this.roomCode, {
+        ...this.roomCodeToGameMap.get(this.roomCode),
+        time: time,
+      });
+
+      this.room.to(this.roomCode).emit("game_time", {
+        status: this.roomCodeToGameMap.get(this.roomCode).status,
+        time: this.roomCodeToGameMap.get(this.roomCode).time,
+      });
+
+      if (time == 0) {
+        clearInterval(timer);
+        return;
+      }
+    }, 1000);
   }
 
   calculateScoreStep() {
@@ -131,6 +180,15 @@ class CatchMindGame {
   }
 
   async endGame() {
+    updateRoom(this.roomCode, null, false)
+      .then((res) => {
+        return getRoomByCode(this.roomCode);
+      })
+      .then((room) => {
+        this.lobby.emit("update_room", room);
+      });
+
+    this.room.to(this.roomCode).emit("game_end");
     this.room.to(this.roomCode).emit("game_reable_canvas");
 
     const sockets = await this.room.in(this.roomCode).fetchSockets();
@@ -143,7 +201,11 @@ class CatchMindGame {
       msg: formatMessage("System", "게임이 종료되었습니다. 다들 안녕~~"),
       type: "system",
     });
-    this.roomCodeToGameMap.set(this.roomCode, false);
+
+    this.roomCodeToGameMap.set(this.roomCode, {
+      ...this.roomCodeToGameMap.get(this.roomCode),
+      status: "waiting",
+    });
   }
 }
 

@@ -1,6 +1,6 @@
 import React from "react";
 
-const Room = ({ title, current, limit, isPlaying, code }) => {
+const Room = ({ title, current, limit, isStarted, code }) => {
   return (
     <li>
       <a href={`/room/${code}`}>
@@ -8,7 +8,7 @@ const Room = ({ title, current, limit, isPlaying, code }) => {
         <span>
           {current} / {limit}
         </span>
-        <span>{isPlaying ? "게임 진행중" : "모집중!"}</span>
+        <span>{isStarted ? "게임 진행중" : "대기중"}</span>
       </a>
     </li>
   );

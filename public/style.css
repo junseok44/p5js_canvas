@@ -51,6 +51,20 @@ body {
   flex: 1;
 }
 
+.disabled {
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.margin {
+  margin: 2rem;
+}
+
+.game_status_header {
+  display: flex;
+  gap: 0.5rem;
+}
+
 #red {
   background-color: red;
 }

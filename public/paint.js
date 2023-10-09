@@ -41,3 +41,14 @@ function reableCanvas() {
   canvas1.style.opacity = 1;
   cursor(ARROW);
 }
+
+const colorItems = document.querySelectorAll(".color__item");
+colorItems.forEach((item) => {
+  item.addEventListener("click", (e) => {
+    colorItems.forEach((item) => {
+      item.classList.remove("selected");
+    });
+    e.target.classList.add("selected");
+    changeStrokeColor(e.target.id);
+  });
+});

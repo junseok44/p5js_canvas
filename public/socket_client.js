@@ -1,4 +1,5 @@
 let socket = io("/rooms");
+let currentRoomUsers = [];
 
 socket.on("alert", (data) => {
   alert(data.msg);
@@ -24,6 +25,7 @@ socket.on("paint", function (data) {
 socket.on("update_users", (data) => {
   const userList = document.querySelector(".all_users");
   userList.innerHTML = "";
+  currentRoomUsers = data;
   data.forEach((user) => {
     const node = document.createElement("li");
     node.innerHTML = user.username;

@@ -11,9 +11,7 @@
   <body>
     <h1>
       <span>방제목 : <span class="room__name"></span></span>
-      <button>
-        <a href="/"> 로비로 나가기 </a>
-      </button>
+      <button onclick="exitGame()">로비로 나가기</button>
     </h1>
     <div class="margin"></div>
 
@@ -93,6 +91,8 @@
     <script src="/paint.js"></script>
     <script src="/game_status.js"></script>
     <script src="/socket_client.js"></script>
+
+    <!-- msg 보내기 관련 -->
     <script>
       const msgContainer = document.querySelector(".chatting__messages");
       const msgInput = document.querySelector(".chatting__input");
@@ -118,6 +118,8 @@
         return node;
       }
     </script>
+
+    <!-- roomname 가져오기 -->
     <script>
       const roomCode = window.location.pathname.split("/")[2];
 
@@ -129,6 +131,7 @@
         });
     </script>
 
+    <!-- 메인 이벤트 핸들러 -->
     <script>
       function setName(event) {
         event.preventDefault();
@@ -170,6 +173,17 @@
         socket.emit("start_game");
       }
 
+      function exitGame() {
+        if (currentRoomUsers.length === 1) {
+          if (confirm("당신이 나가시면 방이 삭제됩니다. 정말 나가시겠어요?")) {
+            socket.emit("exit_room");
+            window.location.href = "/";
+          }
+        } else {
+          window.location.href = "/";
+        }
+      }
+
       function saveImage() {
         saveCanvas(canvas1, "myImage", "jpg");
       }
@@ -183,18 +197,6 @@
         stroke(color);
         paintColor = color;
       }
-    </script>
-    <script>
-      const colorItems = document.querySelectorAll(".color__item");
-      colorItems.forEach((item) => {
-        item.addEventListener("click", (e) => {
-          colorItems.forEach((item) => {
-            item.classList.remove("selected");
-          });
-          e.target.classList.add("selected");
-          changeStrokeColor(e.target.id);
-        });
-      });
     </script>
   </body>
 </html>

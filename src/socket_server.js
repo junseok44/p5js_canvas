@@ -129,7 +129,18 @@ room.on("connection", (socket) => {
     });
   });
 
+  socket.on("exit_room", () => {
+    if (roomCodetoSessionMap.get(roomCode).length === 1) {
+      deleteRoom(roomCode).then((result) => {
+        roomCodeToGameMap.delete(roomCode);
+        roomCodetoSessionMap.delete(roomCode);
+        lobby.emit("delete_room", roomCode);
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
+    // db에서 현재인원 업데이트 후 lobby에 상태 업데이트
     updateRoom(roomCode, -1, null)
       .then((result) => {
         if (result.affectedRows === 0 || result.changedRows === 0) {
@@ -138,30 +149,30 @@ room.on("connection", (socket) => {
         return getRoomByCode(roomCode);
       })
       .then((room) => {
-        if (room.count === 0) {
-          deleteRoom(roomCode).then((result) => {
-            roomCodeToGameMap.delete(roomCode);
-            roomCodetoSessionMap.delete(roomCode);
-            lobby.emit("delete_room", roomCode);
-          });
-        } else {
-          lobby.emit("update_room", room);
-        }
+        lobby.emit("update_room", room);
       })
       .catch((err) => console.log(err));
 
     socket.leave(roomCode);
 
-    roomCodetoSessionMap.set(
-      roomCode,
-      roomCodetoSessionMap.get(roomCode).filter((s) => s.id !== session.id)
-    );
-    room.to(roomCode).emit("update_users", roomCodetoSessionMap.get(roomCode));
+    // 방이 아직 남아있다면.
+    if (roomCodetoSessionMap.has(roomCode)) {
+      // 해당 세션은 방 map에서 제거하기
+      roomCodetoSessionMap.set(
+        roomCode,
+        roomCodetoSessionMap.get(roomCode).filter((s) => s.id !== session.id)
+      );
 
-    room.to(roomCode).emit("message", {
-      msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),
-      type: "system",
-    });
+      // 룸의 다른 유저들의 유저목록 업데이트하기
+      room
+        .to(roomCode)
+        .emit("update_users", roomCodetoSessionMap.get(roomCode));
+
+      room.to(roomCode).emit("message", {
+        msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),
+        type: "system",
+      });
+    }
   });
 
   socket.on("paint", function (data) {

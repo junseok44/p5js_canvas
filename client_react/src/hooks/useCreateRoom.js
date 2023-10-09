@@ -21,6 +21,14 @@ const useCreateRoom = () => {
 
     // 여기서 이제 쿼리를 보낸다.
     socket.emit("create_room", roomForm);
+
+    setRoomForm({
+      roomTitle: "",
+      roomMax: 4,
+      roomPublic: true,
+      roomPassword: "",
+      roomPasswordCheck: "",
+    });
   };
 
   return {

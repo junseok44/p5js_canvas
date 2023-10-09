@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
-
+import React from "react";
+import "./reset.css";
+import { useState } from "react";
 import Room from "./Components/Room";
 import useSocket from "./hooks/useSocket";
 import Modal_createRoom from "./Components/Modal_createRoom";
 import Modal_joinRoom from "./Components/Modal_joinRoom";
 import useCreateRoom from "./hooks/useCreateRoom";
 import useJoinRoom from "./hooks/useJoinRoom";
+
+import { Box, Typography, Button, Container } from "@mui/material";
+
+import List from "@mui/material/List";
 
 export default () => {
   const [rooms, setRooms] = useState([]);
@@ -27,50 +32,83 @@ export default () => {
 
   return (
     <div className="App">
-      <h1>정문기입과 함께하는 캐치마인드</h1>
-      <span>{connected ? "온라인" : "오프라인"}</span>
-      <h3>ROOMS</h3>
-      <button onClick={() => setIsRoomCreateModal(!isRoomCreateModal)}>
-        방 만들기
-      </button>
-      <button onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}>
-        방 참가하기
-      </button>
+      <Container maxWidth="sm" sx={{ mt: 2 }}>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
+          <Typography
+            sx={{
+              fontSize: 30,
+              fontWeight: "bold",
+              color: "#3f51b5",
+            }}
+          >
+            캐치마인드 with 정문기입
+          </Typography>
+          <Typography sx={{ mb: 0.7 }}>
+            {connected ? "온라인" : "오프라인"}
+          </Typography>
+        </Box>
+        <Box sx={{ mb: 2 }}></Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="contained"
+            onClick={() => setIsRoomCreateModal(!isRoomCreateModal)}
+          >
+            방 만들기
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}
+          >
+            방 참가하기
+          </Button>
+        </Box>
+        <Box sx={{ mb: 2 }}></Box>
 
-      <ul className="room_list">
-        {rooms.length == 0
-          ? "방이 없습니다"
-          : rooms.map((room) => (
-              <Room
-                key={room.id}
-                title={room.title}
-                current={room.count}
-                isStarted={room.isStarted}
-                limit={room.maximum}
-                code={room.roomCode}
-              ></Room>
-            ))}
-      </ul>
-
-      {isRoomCreateModal && (
-        <Modal_createRoom
-          onPressCancel={() => setIsRoomCreateModal(false)}
-          onPressConfirm={submitForm}
-          roomForm={roomForm}
-          setRoomForm={setRoomForm}
-        ></Modal_createRoom>
-      )}
-      {isRoomJoinModal && (
-        <Modal_joinRoom
-          onPressCancel={() => setIsRoomJoinModal(false)}
-          roomCode={roomCode}
-          setRoomCode={setRoomCode}
-          onPressConfirm={() => {
-            joinRoom(roomCode);
-            setIsRoomJoinModal(false);
+        <h3>방 목록</h3>
+        <List
+          sx={{
+            width: "100%",
+            bgcolor: "background.paper",
+            maxHeight: 350,
+            overflow: "auto",
           }}
-        ></Modal_joinRoom>
-      )}
+        >
+          {!connected
+            ? "로딩중..."
+            : rooms.length == 0
+            ? "방이 없습니다"
+            : rooms.map((room) => (
+                <Room
+                  key={room.id}
+                  title={room.title}
+                  current={room.count}
+                  isStarted={room.isStarted}
+                  limit={room.maximum}
+                  code={room.roomCode}
+                ></Room>
+              ))}
+        </List>
+
+        {isRoomCreateModal && (
+          <Modal_createRoom
+            onPressCancel={() => setIsRoomCreateModal(false)}
+            onPressConfirm={submitForm}
+            roomForm={roomForm}
+            setRoomForm={setRoomForm}
+          ></Modal_createRoom>
+        )}
+        {isRoomJoinModal && (
+          <Modal_joinRoom
+            onPressCancel={() => setIsRoomJoinModal(false)}
+            roomCode={roomCode}
+            setRoomCode={setRoomCode}
+            onPressConfirm={() => {
+              joinRoom(roomCode);
+              setIsRoomJoinModal(false);
+            }}
+          ></Modal_joinRoom>
+        )}
+      </Container>
     </div>
   );
 };

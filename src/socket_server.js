@@ -142,23 +142,23 @@ room.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    // db에서 현재인원 업데이트 후 lobby에 상태 업데이트
-    updateRoom(roomCode, -1, null)
-      .then((result) => {
-        if (result.affectedRows === 0 || result.changedRows === 0) {
-          return;
-        }
-        return getRoomByCode(roomCode);
-      })
-      .then((room) => {
-        lobby.emit("update_room", room);
-      })
-      .catch((err) => console.log(err));
-
     socket.leave(roomCode);
 
     // 방이 아직 남아있다면.
     if (roomCodetoSessionMap.has(roomCode)) {
+      // db에서 현재인원 업데이트 후 lobby에 상태 업데이트
+      updateRoom(roomCode, -1, null)
+        .then((result) => {
+          if (result.affectedRows === 0 || result.changedRows === 0) {
+            return;
+          }
+          return getRoomByCode(roomCode);
+        })
+        .then((room) => {
+          lobby.emit("update_room", room);
+        })
+        .catch((err) => console.log(err));
+
       // 해당 세션은 방 map에서 제거하기
       roomCodetoSessionMap.set(
         roomCode,

@@ -1,7 +1,8 @@
 import React from "react";
 import Modal_content from "./Modal_content";
 import Modal_overlay from "./Modal_overlay";
-import Box from "./Box";
+import { Box, Button } from "@mui/material";
+import { Typography } from "@mui/material";
 const Modal_joinRoom = ({
   onPressCancel,
   onPressConfirm,
@@ -11,7 +12,9 @@ const Modal_joinRoom = ({
   return (
     <Modal_overlay>
       <Modal_content>
-        <h1>방 참가하기</h1>
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          방 참가하기
+        </Typography>
         <input
           type="text"
           placeholder="방 초대코드"
@@ -20,10 +23,14 @@ const Modal_joinRoom = ({
             setRoomCode(e.target.value);
           }}
         />
-
-        <Box>
-          <button onClick={onPressCancel}>취소</button>
-          <button onClick={onPressConfirm}>확인</button>
+        <Box sx={{ mb: 1 }}></Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button color="error" variant="outlined" onClick={onPressCancel}>
+            취소
+          </Button>
+          <Button variant="outlined" onClick={onPressConfirm}>
+            확인
+          </Button>
         </Box>
       </Modal_content>
     </Modal_overlay>

@@ -29,6 +29,7 @@ export default (setRooms) => {
     });
 
     socket.on("update_room", (room) => {
+      console.log("updating room" + room);
       setRooms((rooms) => rooms.map((r) => (r.id === room.id ? room : r)));
     });
 

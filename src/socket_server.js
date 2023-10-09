@@ -58,6 +58,7 @@ room.on("connection", (socket) => {
   const session = socket.request.session;
   session.username = session.username || "Guest";
   const username = session.username;
+  session.save();
 
   if (roomCodetoSessionMap.has(roomCode)) {
     roomCodetoSessionMap.get(roomCode).push(session);
@@ -98,6 +99,7 @@ room.on("connection", (socket) => {
       socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
       return;
     }
+
     new CatchMindGame(
       room,
       roomCode,

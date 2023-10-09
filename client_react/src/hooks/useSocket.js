@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { socketState } from "../state/socket";
 import { setRecoil } from "recoil-nexus";
 
-let src = "http://localhost:8080/lobby";
+let src = "/lobby";
 
 export default (setRooms) => {
   const [connected, setConnected] = useState(false);

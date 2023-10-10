@@ -13,7 +13,11 @@ const CatchMindGame = require("./game.js");
 
 let io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://ec2-3-35-48-144.ap-northeast-2.compute.amazonaws.com",
+    origin: [
+      "http://ec2-3-35-48-144.ap-northeast-2.compute.amazonaws.com",
+      "http://127.0.0.1:8080",
+      "http://127.0.0.1:3000",
+    ],
     methods: ["GET", "POST"],
   },
 });

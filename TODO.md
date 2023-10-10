@@ -6,9 +6,13 @@ todos
 
 - [ ] 점수 계산
 
+* [ ] 제작자 정보 추가하기
+
+* [ ] room page 디자인 & 버튼 a 태그 크기 늘리기.
+
 * [ ] UI/UX 개선하기 -> material ui css framework 활용.
 
-* [ ] 배포하기. amazon aws + RDS 서버 연결
+* [x] ~~_배포하기. amazon aws + RDS 서버 연결_~~ [2023-10-10]
 
 - [ ] [BUG] 시간 계산에서 1초씩 밀리는것같음.
 

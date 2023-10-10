@@ -37,7 +37,7 @@ socket.on("update_room_status", (data) => {
   switch (data.status) {
     case "waiting":
       changeGameStatus(waitingPhase);
-      setTimer(waitingPhase, data.time);
+      // setTimer(waitingPhase, data.time);
       break;
     case "drawing":
       changeGameStatus(drawPhase);

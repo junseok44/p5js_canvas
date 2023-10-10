@@ -6,7 +6,7 @@ let paintColor = 0;
 let isDisabled = false;
 
 function setup() {
-  canvas1 = createCanvas(1200, 400);
+  canvas1 = createCanvas(windowWidth, 400);
   strokeWeight(cursorWidth);
   stroke(paintColor);
   background(255);
@@ -51,4 +51,24 @@ colorItems.forEach((item) => {
     e.target.classList.add("selected");
     changeStrokeColor(e.target.id);
   });
+});
+
+window.addEventListener("resize", () => {
+  resizeCanvas(windowWidth, 400);
+  // background(255);
+  // strokeWeight(cursorWidth);
+  // stroke(paintColor);
+});
+
+canvas1.addEventListener("touchstart", function (event) {
+  event.preventDefault();
+});
+canvas1.addEventListener("touchmove", function (event) {
+  event.preventDefault();
+});
+canvas1.addEventListener("touchend", function (event) {
+  event.preventDefault();
+});
+canvas1.addEventListener("touchcancel", function (event) {
+  event.preventDefault();
 });

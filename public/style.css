@@ -6,6 +6,7 @@ body {
 
 .p5Canvas {
   border: 1px solid black;
+  box-sizing: border-box;
 }
 
 .chat__container {
@@ -47,6 +48,15 @@ body {
   scroll-behavior: smooth;
 }
 
+.myrow {
+  display: flex;
+  align-items: center;
+}
+
+.space_between {
+  justify-content: space-between;
+}
+
 .item {
   flex: 1;
 }
@@ -63,6 +73,24 @@ body {
 .game_status_header {
   display: flex;
   gap: 0.5rem;
+}
+
+input[type="range"] {
+  width: auto;
+}
+
+.btn {
+  min-width: max-content;
+}
+
+input[type="checkbox"]:not(:checked),
+[type="checkbox"]:checked {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.label_answerCheck {
+  min-width: max-content;
 }
 
 #red {
@@ -83,4 +111,10 @@ body {
 
 #pink {
   background-color: pink;
+}
+
+@media screen and (max-width: 450px) {
+  .myrow {
+    flex-direction: column;
+  }
 }

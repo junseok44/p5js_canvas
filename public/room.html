@@ -5,63 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>캐치마인드 with p5.js</title>
     <link rel="stylesheet" href="/reset.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
     <link rel="stylesheet" href="/style.css" />
   </head>
 
   <body>
-    <h1>
-      <span>방제목 : <span class="room__name"></span></span>
-      <button onclick="exitGame()">로비로 나가기</button>
-    </h1>
+    <div class="myrow valign-wrapper space_between">
+      <h3>
+        <span>방제목 : <span class="room__name"></span></span>
+      </h3>
+      <button class="waves-effect btn" onclick="exitGame()">
+        로비로 나가기
+      </button>
+    </div>
+
     <div class="margin"></div>
 
-    <div class="chat__container">
-      <div class="chatting__box item">
-        <h2>채팅</h2>
-        <div class="chatting__messages"></div>
-        <form class="chatting__form" onsubmit="send_message(event)">
-          <input type="text" class="chatting__input" />
-          <button
-            type="submit"
-            class="chatting__submit"
-            onclick="send_message(event)"
-          >
-            전송
-          </button>
-          <div>
-            <label for="answerCheck">정답 입력</label>
-            <input type="checkbox" id="answerCheck" />
+    <div class="row">
+      <div class="col s12 m4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title bold">채팅</span>
+            <div class="chatting__messages"></div>
           </div>
-        </form>
-      </div>
-      <div class="game_status item">
-        <div class="game_status_header">
-          <h2>게임 상태</h2>
-          <button onclick="startGame()">게임 시작하기</button>
+          <div class="card-action">
+            <form class="chatting__form myrow" onsubmit="send_message(event)">
+              <input type="text" class="chatting__input white" />
+              <button class="waves-effect btn">전송</button>
+              <div>
+                <label for="answerCheck" class="label_answerCheck"
+                  >정답 입력</label
+                >
+                <input type="checkbox" id="answerCheck" />
+              </div>
+            </form>
+          </div>
         </div>
-        <ul class="game_status_list">
-          <li class="waitingPhase">대기중</li>
-          <li class="drawPhase disabled">그리기 단계 <span>20</span>초</li>
-          <li class="answerPhase disabled">맞추기 단계 <span>20</span>초</li>
-        </ul>
       </div>
-      <div class="item">
-        <div class="user_container">
-          <h2>현재 접속자</h2>
-          <ul class="all_users"></ul>
+      <div class="col s6 m4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title bold">게임상태 </span>
+            <ul class="game_status_list">
+              <li class="waitingPhase">대기중...</li>
+              <li class="drawPhase disabled">그리기 단계 <span>20</span>초</li>
+              <li class="answerPhase disabled">
+                맞추기 단계 <span>20</span>초
+              </li>
+            </ul>
+            <button class="waves-effect btn" onclick="startGame()">
+              게임 시작하기
+            </button>
+          </div>
         </div>
-        <div class="form__set-name">
-          <h4>현재 이름 : <span id="username"></span></h4>
-          <form onsubmit="setName(event)">
-            <input type="text" class="input__name" />
-            <button type="submit" class="btn__set-name">이름 설정</button>
-          </form>
+      </div>
+      <div class="col s6 m4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title bold">현재 접속자 </span>
+
+            <div class="user_container">
+              <ul class="all_users"></ul>
+            </div>
+          </div>
+          <div class="card-action">
+            (당신의 이름 : <span id="username"></span>)
+            <form onsubmit="setName(event)" class="myrow">
+              <input type="text" class="input__name" />
+              <button type="submit" class="btn__set-name waves-effect btn">
+                이름 변경
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
     <div class="margin"></div>
     <div class="canvas__controller">
-      <label for="strokeWeight">크기</label>
+      <label for="strokeWeight">펜 크기</label>
       <input
         type="range"
         max="20"
@@ -70,7 +94,7 @@
         onchange="onChangeStrokeWeight(event)"
       />
       <button onclick="setEraser()">지우개</button>
-      <button onclick="setPaint()">펜</button>
+      <button onclick="setPaint()">검은펜</button>
       <button onclick="resetCanvas()">리셋하기</button>
 
       <div class="color__palette">
@@ -81,6 +105,7 @@
         <div class="color__item" id="pink"></div>
       </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <script
       language="javascript"

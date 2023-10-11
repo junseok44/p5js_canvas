@@ -10,7 +10,6 @@ function setup() {
   strokeWeight(cursorWidth);
   stroke(paintColor);
   background(255);
-  // cursor("https://avatars0.githubusercontent.com/u/1617169?s=16");
 }
 function draw() {
   if (mouseIsPressed && !isDisabled) {

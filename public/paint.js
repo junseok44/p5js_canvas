@@ -4,7 +4,7 @@ let prevY = 0;
 let cursorWidth = 5;
 let paintColor = 0;
 let isDisabled = false;
-
+let touchTriggered = false;
 function setup() {
   canvas1 = createCanvas(windowWidth, 400);
   strokeWeight(cursorWidth);
@@ -12,9 +12,14 @@ function setup() {
   background(255);
   // cursor("https://avatars0.githubusercontent.com/u/1617169?s=16");
 }
-
 function draw() {
   if (mouseIsPressed && !isDisabled) {
+    if (!touchTriggered) {
+      touchTriggered = true;
+      prevX = mouseX;
+      prevY = mouseY;
+    }
+
     line(prevX, prevY, mouseX, mouseY);
     let data = {
       x: mouseX,
@@ -28,6 +33,10 @@ function draw() {
   }
   prevX = mouseX;
   prevY = mouseY;
+}
+
+function mouseReleased() {
+  touchTriggered = false;
 }
 
 function disableCanvas() {
@@ -58,17 +67,4 @@ window.addEventListener("resize", () => {
   // background(255);
   // strokeWeight(cursorWidth);
   // stroke(paintColor);
-});
-
-canvas1.addEventListener("touchstart", function (event) {
-  event.preventDefault();
-});
-canvas1.addEventListener("touchmove", function (event) {
-  event.preventDefault();
-});
-canvas1.addEventListener("touchend", function (event) {
-  event.preventDefault();
-});
-canvas1.addEventListener("touchcancel", function (event) {
-  event.preventDefault();
 });

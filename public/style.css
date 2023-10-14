@@ -4,6 +4,10 @@ body {
   background-color: white;
 }
 
+.container {
+  padding: 0 1rem;
+}
+
 .p5Canvas {
   border: 1px solid black;
   box-sizing: border-box;
@@ -69,6 +73,10 @@ body {
 
 .margin {
   margin: 2rem;
+}
+
+.margin_1 {
+  margin-bottom: 1rem;
 }
 
 .gap {

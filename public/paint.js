@@ -5,8 +5,13 @@ let cursorWidth = 5;
 let paintColor = 0;
 let isDisabled = false;
 let touchTriggered = false;
+
 function setup() {
-  canvas1 = createCanvas(windowWidth, 400);
+  let canvasDiv = document.getElementById("roomContainer");
+  let width = canvasDiv.offsetWidth;
+
+  canvas1 = createCanvas(width, 400);
+  canvas1.parent("roomContainer");
   strokeWeight(cursorWidth);
   stroke(paintColor);
   background(255);
@@ -62,7 +67,9 @@ colorItems.forEach((item) => {
 });
 
 window.addEventListener("resize", () => {
-  resizeCanvas(windowWidth, 400);
+  let canvasDiv = document.getElementById("roomContainer");
+  let width = canvasDiv.offsetWidth;
+  resizeCanvas(width, 400);
   // background(255);
   // strokeWeight(cursorWidth);
   // stroke(paintColor);

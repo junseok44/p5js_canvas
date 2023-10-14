@@ -12,7 +12,7 @@ import {
 const Room = ({ title, current, limit, isStarted, code }) => {
   return (
     <ListItemButton disableGutters>
-      <a href={`/room/${code}`}>
+      <a href={`/room/${code}`} style={{ width: "100%" }}>
         <ListItem alignItems="flex-start">
           <ListItemAvatar>
             <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
@@ -30,7 +30,17 @@ const Room = ({ title, current, limit, isStarted, code }) => {
                   {current} / {limit}
                 </Typography>
                 {"  "}
-                {isStarted ? "게임 진행중" : "대기중..."}
+                <Typography
+                  sx={{
+                    display: "inline",
+                    color: isStarted ? "red" : "green",
+                    fontWeight: "bold",
+                  }}
+                  component="span"
+                  variant="body2"
+                >
+                  {isStarted ? "게임 진행중" : "대기중..."}
+                </Typography>
               </>
             }
           />

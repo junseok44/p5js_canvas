@@ -5,11 +5,12 @@ let cursorWidth = 5;
 let paintColor = 0;
 let isDisabled = false;
 let touchTriggered = false;
+let canvasHeight = 400;
 
 function setup() {
   let canvasDiv = document.getElementById("roomContainer");
   let width = getContentWidth(canvasDiv);
-  canvas1 = createCanvas(width, 400);
+  canvas1 = createCanvas(width, canvasHeight);
   canvas1.parent("roomContainer");
   strokeWeight(cursorWidth);
   stroke(paintColor);
@@ -68,7 +69,7 @@ colorItems.forEach((item) => {
 window.addEventListener("resize", () => {
   let canvasDiv = document.getElementById("roomContainer");
   let width = getContentWidth(canvasDiv);
-  resizeCanvas(width, 400);
+  resizeCanvas(width, canvasHeight);
   // background(255);
   // strokeWeight(cursorWidth);
   // stroke(paintColor);

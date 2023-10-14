@@ -7,7 +7,7 @@ import Modal_createRoom from "./Components/Modal_createRoom";
 import Modal_joinRoom from "./Components/Modal_joinRoom";
 import useCreateRoom from "./hooks/useCreateRoom";
 import useJoinRoom from "./hooks/useJoinRoom";
-
+import { Helmet } from "react-helmet";
 import { Box, Typography, Button, Container } from "@mui/material";
 
 import List from "@mui/material/List";
@@ -32,6 +32,9 @@ export default () => {
 
   return (
     <div className="App">
+      <Helmet>
+        <title>캐치마인드 한접시 하실래요?</title>
+      </Helmet>
       <Container maxWidth="sm" sx={{ mt: 2 }}>
         <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
           <Typography
@@ -41,7 +44,7 @@ export default () => {
               color: "#3f51b5",
             }}
           >
-            캐치마인드 with 정문기입
+            캐치마인드 in 정문기입
           </Typography>
           <Typography sx={{ mb: 0.7 }}>
             {connected ? "온라인" : "오프라인"}

@@ -101,6 +101,13 @@ input[type="range"] {
   min-width: max-content;
 }
 
+.all_users {
+  height: 7rem;
+  overflow-y: scroll;
+
+  scroll-behavior: smooth;
+}
+
 input[type="checkbox"]:not(:checked),
 [type="checkbox"]:checked {
   opacity: 1;
@@ -135,5 +142,13 @@ input[type="checkbox"]:not(:checked),
 @media screen and (max-width: 450px) {
   .myrow {
     flex-direction: column;
+  }
+
+  .container {
+    width: auto;
+  }
+
+  .all_users {
+    height: 3rem;
   }
 }

@@ -8,8 +8,7 @@ let touchTriggered = false;
 
 function setup() {
   let canvasDiv = document.getElementById("roomContainer");
-  let width = canvasDiv.offsetWidth;
-
+  let width = getContentWidth(canvasDiv);
   canvas1 = createCanvas(width, 400);
   canvas1.parent("roomContainer");
   strokeWeight(cursorWidth);
@@ -68,9 +67,19 @@ colorItems.forEach((item) => {
 
 window.addEventListener("resize", () => {
   let canvasDiv = document.getElementById("roomContainer");
-  let width = canvasDiv.offsetWidth;
+  let width = getContentWidth(canvasDiv);
   resizeCanvas(width, 400);
   // background(255);
   // strokeWeight(cursorWidth);
   // stroke(paintColor);
 });
+
+function getContentWidth(element) {
+  var styles = getComputedStyle(element);
+
+  return (
+    parseInt(styles.width) -
+    parseFloat(styles.paddingLeft) -
+    parseFloat(styles.paddingRight)
+  );
+}

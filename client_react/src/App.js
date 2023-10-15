@@ -33,7 +33,7 @@ export default () => {
   return (
     <div className="App">
       <Helmet>
-        <title>캐치마인드 한접시 하실래요?</title>
+        <title>캐치마인드 한접시</title>
       </Helmet>
       <Container maxWidth="sm" sx={{ mt: 2 }}>
         <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
@@ -44,7 +44,7 @@ export default () => {
               color: "#3f51b5",
             }}
           >
-            캐치마인드 in 정문기입
+            캐치마인드 with p5.js
           </Typography>
           <Typography sx={{ mb: 0.7 }}>
             {connected ? "온라인" : "오프라인"}

@@ -21,6 +21,23 @@ const question_words = [
   "단풍",
   "달걀",
   "사막",
+  "명탐정",
+  "무전기",
+  "무지개",
+  "샌드백",
+  "순두부",
+  "수수떡",
+  "사이렌",
+  "우체통",
+  "입체파",
+  "유재석",
+  "작곡가",
+  "진공관",
+  "정문기입",
+  "저녁밥",
+  "종이컵",
+  "자판기",
+  "재활용",
 ];
 
 const drawPhaseTime = 30000;
@@ -110,6 +127,18 @@ class CatchMindGame {
 
     sockets.forEach((socket) => {
       socket.on("send_answer", (data) => {
+        if (this.host.id == socket.id) {
+          socket.emit("message", {
+            msg: formatMessage(
+              "system",
+              `그림을 그린 사람은 정답을 맞출 수 없습니다.`
+            ),
+            tyep: "fail",
+          });
+
+          return;
+        }
+
         if (this.validateAnswer(data.answer)) {
           clearTimeout(answerTimer);
           this.room.to(this.roomCode).emit("message", {

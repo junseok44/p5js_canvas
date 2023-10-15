@@ -33,7 +33,12 @@ export default () => {
   return (
     <div className="App">
       <Helmet>
-        <title>캐치마인드 한접시</title>
+        <title>캐치마인드 with p5.js</title>
+        <meta property="og:title" content={"캐치마인드 with p5.js"} />
+        <meta
+          name="description"
+          content="시험공부하기 싫은 당신, 캐치마인드 한접시 어떠세요"
+        />
       </Helmet>
       <Container maxWidth="sm" sx={{ mt: 2 }}>
         <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>

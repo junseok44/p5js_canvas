@@ -11,6 +11,8 @@ import { Helmet } from "react-helmet";
 import { Box, Typography, Button, Container } from "@mui/material";
 
 import List from "@mui/material/List";
+import { useReport } from "./hooks/useReport";
+import Modal_report from "./Components/Modal_report";
 
 export default () => {
   const [rooms, setRooms] = useState([]);
@@ -29,6 +31,15 @@ export default () => {
     joinRoom,
     setRoomCode,
   } = useJoinRoom();
+
+  const {
+    isReportModal,
+    onPressCancel,
+    onPressConfirm,
+    onPressReport,
+    report,
+    onChangeReport,
+  } = useReport();
 
   return (
     <div className="App">
@@ -68,6 +79,9 @@ export default () => {
             onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}
           >
             방 참가하기
+          </Button>
+          <Button variant="outlined" onClick={onPressReport} color={"error"}>
+            버그신고
           </Button>
         </Box>
         <Box sx={{ mb: 2 }}></Box>
@@ -115,6 +129,14 @@ export default () => {
               setIsRoomJoinModal(false);
             }}
           ></Modal_joinRoom>
+        )}
+        {isReportModal && (
+          <Modal_report
+            onPressCancel={onPressCancel}
+            onPressConfirm={onPressConfirm}
+            report={report}
+            onChangeReport={onChangeReport}
+          ></Modal_report>
         )}
       </Container>
     </div>

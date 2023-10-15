@@ -133,7 +133,7 @@ class CatchMindGame {
               "system",
               `그림을 그린 사람은 정답을 맞출 수 없습니다.`
             ),
-            tyep: "fail",
+            type: "fail",
           });
 
           return;
@@ -234,6 +234,7 @@ class CatchMindGame {
     this.roomCodeToGameMap.set(this.roomCode, {
       ...this.roomCodeToGameMap.get(this.roomCode),
       status: "waiting",
+      hostId: null,
     });
   }
 }

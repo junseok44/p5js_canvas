@@ -104,13 +104,20 @@ room.on("connection", (socket) => {
       return;
     }
 
-    new CatchMindGame(
+    let game = new CatchMindGame(
       room,
       roomCode,
       socket,
       roomCodeToGameMap,
       lobby
-    ).startGame();
+    );
+
+    game.startGame();
+
+    roomCodeToGameMap.set(roomCode, {
+      ...roomCodeToGameMap.get(roomCode),
+      hostId: game.host.id,
+    });
   });
 
   socket.on("set_name", (data) => {
@@ -186,6 +193,28 @@ room.on("connection", (socket) => {
   });
 
   socket.on("reset", function (data) {
+    if (roomCodeToGameMap.get(roomCode)?.status === "answer") {
+      socket.emit("message", {
+        msg: formatMessage(
+          "server",
+          `지금은 정답을 맞추는 페이즈라 리셋할 수 없습니다.`
+        ),
+        type: "fail",
+      });
+      return;
+    } else if (roomCodeToGameMap.get(roomCode)?.hostId) {
+      if (roomCodeToGameMap.get(roomCode)?.hostId !== socket.id) {
+        socket.emit("message", {
+          msg: formatMessage(
+            "server",
+            `다른 사람이 그림을 그리고 있어서 리셋할 수 없어요.`
+          ),
+          type: "fail",
+        });
+        return;
+      }
+    }
+
     room.to(roomCode).emit("reset", data);
   });
 });

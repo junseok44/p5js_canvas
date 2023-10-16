@@ -9,7 +9,7 @@ import useCreateRoom from "./hooks/useCreateRoom";
 import useJoinRoom from "./hooks/useJoinRoom";
 import { Helmet } from "react-helmet";
 import { Box, Typography, Button, Container } from "@mui/material";
-
+import GitHubIcon from "@mui/icons-material/GitHub";
 import List from "@mui/material/List";
 import { useReport } from "./hooks/useReport";
 import Modal_report from "./Components/Modal_report";
@@ -45,11 +45,6 @@ export default () => {
     <div className="App">
       <Helmet>
         <title>캐치마인드 with p5.js</title>
-        <meta property="og:title" content={"캐치마인드 with p5.js"} />
-        <meta
-          name="og:description"
-          content="따분한 시험기간, 캐치마인드 한접시?"
-        />
       </Helmet>
       <Container maxWidth="sm" sx={{ mt: 2 }}>
         <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
@@ -67,22 +62,53 @@ export default () => {
           </Typography>
         </Box>
         <Box sx={{ mb: 2 }}></Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="contained"
-            onClick={() => setIsRoomCreateModal(!isRoomCreateModal)}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+            }}
           >
-            방 만들기
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}
+            <Button
+              variant="contained"
+              onClick={() => setIsRoomCreateModal(!isRoomCreateModal)}
+            >
+              방 만들기
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setIsRoomJoinModal(!isRoomJoinModal)}
+            >
+              방 참가하기
+            </Button>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+            }}
           >
-            방 참가하기
-          </Button>
-          <Button variant="outlined" onClick={onPressReport} color={"error"}>
-            버그신고
-          </Button>
+            <Button variant="outlined" onClick={onPressReport} color={"error"}>
+              피드백
+            </Button>
+            <a
+              href="https://github.com/junseok44/p5js_canvas"
+              target="_blank"
+              style={{ cursor: "pointer " }}
+            >
+              <GitHubIcon></GitHubIcon>
+            </a>
+          </Box>
         </Box>
         <Box sx={{ mb: 2 }}></Box>
 
@@ -91,7 +117,7 @@ export default () => {
           sx={{
             width: "100%",
             bgcolor: "background.paper",
-            maxHeight: 350,
+            maxHeight: 370,
             overflow: "auto",
           }}
         >

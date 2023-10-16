@@ -16,11 +16,12 @@ const Modal_report = ({
           버그신고 & 건의사항
         </Typography>
         <Typography variant="body1" sx={{ mb: 1 }}>
-          개발자를 괴롭혀주세요
+          이 개발자는 무료로 해드립니다.
         </Typography>
 
         <textarea
           onChange={onChangeReport}
+          placeholder="나쁜말은 삼가주세요ㅠㅠ"
           style={{
             width: "100%",
             height: "10rem",

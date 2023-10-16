@@ -13,11 +13,11 @@
   </head>
 
   <body>
-    <div class="container" id="roomContainer">
+    <div class="container">
       <div class="myrow valign-wrapper space_between">
-        <h3>
+        <h5>
           <span>방제목 : <span class="room__name"></span></span>
-        </h3>
+        </h5>
         <button class="waves-effect btn" onclick="exitGame()">
           로비로 나가기
         </button>
@@ -26,43 +26,29 @@
       <div class="margin_1"></div>
 
       <div class="row">
-        <div class="col s6 m4">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title bold">게임상태 </span>
-              <ul class="game_status_list">
-                <li class="waitingPhase">대기중...</li>
-                <li class="drawPhase disabled">
-                  그리기 단계 <span>20</span>초
-                </li>
-                <li class="answerPhase disabled">
-                  맞추기 단계 <span>20</span>초
-                </li>
-              </ul>
-              <button class="waves-effect btn" onclick="startGame()">
-                게임 시작하기
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="col s6 m4">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title bold">현재 접속자 </span>
+        <div class="col s12 m8">
+          <div id="roomContainer"></div>
+          <div class="canvas__controller">
+            <label for="strokeWeight">펜 크기</label>
+            <input
+              type="range"
+              max="20"
+              min="1"
+              id="strokeWeight"
+              onchange="onChangeStrokeWeight(event)"
+            />
+            <button onclick="setEraser()">지우개</button>
+            <button onclick="setPaint()">검은펜</button>
+            <button onclick="resetCanvas()">리셋하기</button>
 
-              <div class="user_container">
-                <ul class="all_users"></ul>
-              </div>
+            <div class="color__palette">
+              <div class="color__item" id="red"></div>
+              <div class="color__item" id="yellow"></div>
+              <div class="color__item" id="green"></div>
+              <div class="color__item" id="orange"></div>
+              <div class="color__item" id="pink"></div>
             </div>
-            <div class="card-action">
-              (당신의 이름 : <span id="username"></span>)
-              <form onsubmit="setName(event)" class="myrow">
-                <input type="text" class="input__name" />
-                <button type="submit" class="btn__set-name waves-effect btn">
-                  이름 변경
-                </button>
-              </form>
-            </div>
+            <div class="margin_1"></div>
           </div>
         </div>
         <div class="col s12 m4">
@@ -82,31 +68,45 @@
               </form>
             </div>
           </div>
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title bold">게임상태 </span>
+              <ul class="game_status_list">
+                <li class="waitingPhase">대기중...</li>
+                <li class="drawPhase disabled">
+                  그리기 단계 <span>20</span>초
+                </li>
+                <li class="answerPhase disabled">
+                  맞추기 단계 <span>20</span>초
+                </li>
+              </ul>
+              <button class="waves-effect btn" onclick="startGame()">
+                게임 시작하기
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title bold">현재 접속자 </span>
+
+              <div class="user_container">
+                <ul class="all_users"></ul>
+              </div>
+            </div>
+            <div class="card-action">
+              (당신의 이름 : <span id="username"></span>)
+              <form onsubmit="setName(event)" class="myrow">
+                <input type="text" class="input__name" />
+                <button type="submit" class="btn__set-name waves-effect btn">
+                  이름 변경
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
       <div class="margin_1"></div>
-      <div class="canvas__controller">
-        <label for="strokeWeight">펜 크기</label>
-        <input
-          type="range"
-          max="20"
-          min="1"
-          id="strokeWeight"
-          onchange="onChangeStrokeWeight(event)"
-        />
-        <button onclick="setEraser()">지우개</button>
-        <button onclick="setPaint()">검은펜</button>
-        <button onclick="resetCanvas()">리셋하기</button>
-
-        <div class="color__palette">
-          <div class="color__item" id="red"></div>
-          <div class="color__item" id="yellow"></div>
-          <div class="color__item" id="green"></div>
-          <div class="color__item" id="orange"></div>
-          <div class="color__item" id="pink"></div>
-        </div>
-        <div class="margin_1"></div>
-      </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 

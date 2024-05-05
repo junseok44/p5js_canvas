@@ -1,19 +1,17 @@
-const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
+import session from "express-session";
+import { redisClient } from "./redis_client.js";
+import RedisStore from "connect-redis";
 
-const SQLStoreOptions = {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-};
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "catchmind:",
+});
 
 const sessionMiddleware = session({
   secret: "secret",
-  store: new MySQLStore(SQLStoreOptions),
+  store: redisStore,
   resave: false,
   saveUninitialized: false,
 });
 
-module.exports = sessionMiddleware;
+export { sessionMiddleware };

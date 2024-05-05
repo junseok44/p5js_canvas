@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id        String   @id @default(cuid())
+  code     Int   @unique @default(autoincrement())
+  title     String
+  password String?
+  maximum Int?
+  wordbook WordBook[]
+  createdAt DateTime @default(now())
+  currentUserCount Int @default(0)
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isAdmin  Boolean  @default(false)
+  wordbooks WordBook[]
+}
+
+model WordBook {
+  id        Int   @id @default(autoincrement())
+  title     String
+  creator  User     @relation(fields: [creatorId], references: [id])
+  creatorId String
+  words     Word[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rooms Room[]
+}
+
+model Word {
+  id        Int   @id @default(autoincrement())
+  word      String
+  createdAt DateTime @default(now())
+  wordBook  WordBook @relation(fields: [wordBookId], references: [id])
+  wordBookId Int
+}

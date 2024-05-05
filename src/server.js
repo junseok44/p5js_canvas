@@ -1,8 +1,13 @@
-require("dotenv").config();
-const { httpServer } = require("./app");
-require("./db.js");
-require("./socket_server");
+import dotenv from "dotenv";
 
-httpServer.listen(8080, () => {
+dotenv.config();
+
+import { httpServer } from "./app.js";
+
+import "./redis_client.js";
+import "./db.js";
+import "./socket.js";
+
+httpServer.listen(process.env.SERVER_PORT, () => {
   console.log("app listening on port 8080");
 });

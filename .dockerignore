@@ -1,0 +1,10 @@
+
+.node_modules   
+.gitignore
+.client_react
+.TODO.md
+.env
+.env.example
+.git
+.gitignore
+.docker-compose.yml

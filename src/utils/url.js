@@ -1,7 +1,3 @@
-function formatMessage(sender, msg) {
-  return `[${sender}]: ${msg}`;
-}
-
 function getRoomCodeFromUrl(socket) {
   const req = socket.request;
   const {
@@ -14,7 +10,4 @@ function getRoomCodeFromUrl(socket) {
   return roomCode;
 }
 
-module.exports = {
-  formatMessage,
-  getRoomCodeFromUrl,
-};
+export { getRoomCodeFromUrl };

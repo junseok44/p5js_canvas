@@ -1,5 +1,3 @@
-const connection = require("../db.js");
-
 const CREATE_REPORT_QUERY = "INSERT INTO report(text) VALUES(?)";
 
 const createReport = async (text) => {

@@ -1,23 +1,27 @@
-const path = require("path");
-const express = require("express");
+import path from "path";
+import express from "express";
+import { sessionMiddleware } from "./session.js";
+import { getRoomByCode } from "./query/roomQuery.js";
+import { getDirname } from "./utils/dir.js";
+import http from "http";
+
 const app = express();
-const httpServer = require("http").createServer(app);
-const sessionMiddleware = require("./session");
-const { getRoomByCode } = require("./query/roomQuery");
-const { createReport } = require("./query/reportQuery");
+const httpServer = http.createServer(app);
 
 app.use(sessionMiddleware);
+
+const __dirname = getDirname(import.meta.url);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../libraries")));
-app.use(express.static(path.join(__dirname, "../client_react/build")));
+app.use(express.static(path.join(__dirname, "../client/build")));
 app.use(
   express.static(path.join(__dirname, "../node_modules/socket.io/client-dist"))
 );
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client_react/build/index.html"));
+  res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
 
 app.get("/room/:code", async (req, res) => {
@@ -42,18 +46,18 @@ app.get("/api/room/:code", async (req, res, next) => {
   }
 });
 
-app.post("/api/report", async (req, res, next) => {
-  try {
-    if (req.body?.report && req.body.report.length > 0) {
-      await createReport(req.body.report);
-      res.send("report created");
-    } else {
-      console.log("no report");
-      res.status(404).send("no report");
-    }
-  } catch (error) {
-    return next(error);
-  }
-});
+// app.post("/api/report", async (req, res, next) => {
+//   try {
+//     if (req.body?.report && req.body.report.length > 0) {
+//       await createReport(req.body.report);
+//       res.send("report created");
+//     } else {
+//       console.log("no report");
+//       res.status(404).send("no report");
+//     }
+//   } catch (error) {
+//     return next(error);
+//   }
+// });
 
-module.exports = { httpServer };
+export { httpServer };

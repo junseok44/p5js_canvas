@@ -1,5 +1,5 @@
-const { updateRoom, getRoomByCode } = require("./query/roomQuery");
-const { formatMessage } = require("./utils");
+import { updateRoom, getRoomByCode } from "./query/roomQuery.js";
+import { formatMessage } from "./utils/message.js";
 
 const question_words = [
   "가격",
@@ -239,4 +239,4 @@ class CatchMindGame {
   }
 }
 
-module.exports = CatchMindGame;
+export default CatchMindGame;

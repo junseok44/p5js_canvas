@@ -24,11 +24,11 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
 
-app.get("/room/:code", async (req, res) => {
-  req.session.count++;
+app.get("/room/:code", async (req, res, next) => {
+  req.session.point = 0;
 
   try {
-    const room = await getRoomByCode(req.params.code);
+    const room = await getRoomByCode(Number(req.params.code));
     if (!room) return res.status(404).send("해당하는 룸이 없어요");
   } catch (error) {
     return next(error);
@@ -38,7 +38,7 @@ app.get("/room/:code", async (req, res) => {
 
 app.get("/api/room/:code", async (req, res, next) => {
   try {
-    const room = await getRoomByCode(req.params.code);
+    const room = await getRoomByCode(Number(req.params.code));
     if (room) res.send(room);
     else res.status(404).send("Room not found");
   } catch (error) {

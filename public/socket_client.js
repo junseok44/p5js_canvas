@@ -10,6 +10,7 @@ socket.on("message", (data) => {
 });
 
 socket.on("set_name", (data) => {
+  console.log(data.name);
   const username = document.querySelector("#username");
   username.innerHTML = data.name;
 });
@@ -23,12 +24,17 @@ socket.on("paint", function (data) {
 });
 
 socket.on("update_users", (data) => {
+  console.log(data);
+
   const userList = document.querySelector(".all_users");
   userList.innerHTML = "";
-  currentRoomUsers = data;
   data.forEach((user) => {
     const node = document.createElement("li");
-    node.innerHTML = user.username;
+    const textnode = document.createTextNode(user.username);
+    const pointNode = document.createElement("span");
+    pointNode.innerHTML = `${user.point}점`;
+    node.appendChild(textnode);
+    node.appendChild(pointNode);
     userList.appendChild(node);
   });
 });

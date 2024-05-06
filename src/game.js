@@ -68,6 +68,9 @@ class CatchMindGame {
         this.lobby.emit("update_room", room);
       });
 
+    // 만약 이 부분을 메모리에서 관리한다고 한다면,
+    // roomCodeToGameMap에 status를 drawing으로 바꿔주고, 시간을 30초로 설정해주면 됨.
+
     this.room.to(this.roomCode).emit("game_drawPhase");
 
     this.startRoomTimer(drawPhaseTime / 1000);

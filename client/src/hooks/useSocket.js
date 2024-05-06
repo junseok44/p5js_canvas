@@ -29,13 +29,22 @@ export default (setRooms) => {
     });
 
     socket.on("update_room", (room) => {
-      console.log("updating room" + room);
-      setRooms((rooms) => rooms.map((r) => (r.id === room.id ? room : r)));
+      console.log(room.code, room.currentUserCount);
+
+      setRooms((rooms) => {
+        return rooms.map((r) =>
+          r.code == room.code
+            ? {
+                ...r,
+                currentUserCount: Number(room.currentUserCount),
+              }
+            : r
+        );
+      });
     });
 
     socket.on("delete_room", (roomCode) => {
-      console.log(roomCode);
-      setRooms((rooms) => rooms.filter((r) => r.roomCode !== roomCode));
+      setRooms((rooms) => rooms.filter((r) => r.code !== roomCode));
     });
 
     return () => socket.disconnect();

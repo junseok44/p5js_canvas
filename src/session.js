@@ -4,7 +4,7 @@ import RedisStore from "connect-redis";
 
 const redisStore = new RedisStore({
   client: redisClient,
-  prefix: "catchmind:",
+  prefix: "user:",
 });
 
 const sessionMiddleware = session({

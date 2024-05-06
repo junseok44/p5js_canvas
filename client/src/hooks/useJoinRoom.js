@@ -2,7 +2,9 @@ import React, { useState } from "react";
 
 const useJoinRoom = () => {
   const [isRoomJoinModal, setIsRoomJoinModal] = useState(false);
+
   const [roomCode, setRoomCode] = useState("");
+
   const joinRoom = (code) => {
     window.location.href = `/room/${code}`;
   };

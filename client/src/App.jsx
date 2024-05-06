@@ -125,16 +125,24 @@ export default () => {
             ? "로딩중..."
             : rooms.length == 0
             ? "방이 없습니다"
-            : rooms.map((room) => (
-                <Room
-                  key={room.id}
-                  title={room.title}
-                  current={room.count}
-                  isStarted={room.isStarted}
-                  limit={room.maximum}
-                  code={room.roomCode}
-                ></Room>
-              ))}
+            : rooms
+                .sort((a, b) => {
+                  const dateA = new Date(a.createdAt);
+                  const dateB = new Date(b.createdAt);
+
+                  return dateB.getTime() - dateA.getTime();
+                })
+                .map((room) => (
+                  <Room
+                    key={room.id}
+                    title={room.title}
+                    초
+                    current={room.currentUserCount}
+                    status={room.status}
+                    limit={room.maximum}
+                    code={room.code}
+                  ></Room>
+                ))}
         </List>
 
         {isRoomCreateModal && (
@@ -168,29 +176,3 @@ export default () => {
     </div>
   );
 };
-
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;

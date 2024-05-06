@@ -9,10 +9,10 @@ import {
   ListItemText,
 } from "@mui/material";
 
-const Room = ({ title, current, limit, isStarted, code }) => {
+const Room = ({ title, current, limit, status, code }) => {
   return (
     <ListItemButton disableGutters>
-      <a href={`/room/${code}`} style={{ width: "100%" }}>
+      <a href={`http://localhost:8000/room/${code}`} style={{ width: "100%" }}>
         <ListItem alignItems="flex-start">
           <ListItemAvatar>
             <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
@@ -27,19 +27,42 @@ const Room = ({ title, current, limit, isStarted, code }) => {
                   variant="body2"
                   color="text.primary"
                 >
-                  {current} / {limit}
+                  {limit ? (
+                    <Typography
+                      sx={{
+                        display: "inline",
+                        color: current >= limit ? "red" : "green",
+                      }}
+                      component="span"
+                      variant="body2"
+                    >
+                      {current} / {limit}
+                    </Typography>
+                  ) : (
+                    <Typography
+                      sx={{
+                        display: "inline",
+                        color: "green",
+                      }}
+                      component="span"
+                      variant="body2"
+                    >
+                      {current}명
+                    </Typography>
+                  )}
                 </Typography>
                 {"  "}
                 <Typography
                   sx={{
                     display: "inline",
-                    color: isStarted ? "red" : "green",
+                    // color: status ? "red" : "green",
+                    color: "green",
                     fontWeight: "bold",
                   }}
                   component="span"
                   variant="body2"
                 >
-                  {isStarted ? "게임 진행중" : "대기중..."}
+                  {status}
                 </Typography>
               </>
             }

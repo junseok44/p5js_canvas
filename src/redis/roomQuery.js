@@ -37,14 +37,36 @@ export async function getUserListOfRoom(roomCode) {
   }
 }
 
+export async function onUserJoinRoomRedis(roomCode, sessionId, username) {
+  try {
+    const [cnt, _, _t] = await Promise.all([
+      redisClient.INCR(`room:${roomCode}:count`),
+      redisClient.HSET(`room:${roomCode}:user_names`, sessionId, username),
+      redisClient.SADD(`room:${roomCode}:users`, sessionId),
+    ]);
+
+    const POINTS = await redisClient.HGETALL(`room:${roomCode}:points`);
+
+    if (!POINTS[sessionId]) {
+      await redisClient.HSET(`room:${roomCode}:points`, sessionId, 0);
+    }
+
+    return cnt;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 export async function onUserLeaveRoomRedis(roomCode, sessionId) {
   try {
-    await Promise.all([
+    const [cnt, _, _t] = await Promise.all([
       redisClient.DECR(`room:${roomCode}:count`),
       redisClient.SREM(`room:${roomCode}:users`, sessionId),
       redisClient.HDEL(`room:${roomCode}:user_names`, sessionId),
-      redisClient.HDEL(`room:${roomCode}:points`, sessionId),
+      // redisClient.HDEL(`room:${roomCode}:points`, sessionId),
     ]);
+
+    return cnt;
   } catch (err) {
     console.log(err);
   }
@@ -52,15 +74,15 @@ export async function onUserLeaveRoomRedis(roomCode, sessionId) {
 
 export async function onStartGameRedis(roomCode) {
   await Promise.all([
-    redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.DRAWING),
+    redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.PLAYING),
   ]);
 }
 
 export async function onCreateRoomRedis(roomCode) {
-  // return Promise.all([
-  //   redisClient.SET(`room:${roomCode}:users`, []),
-  //   redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
-  // ]);
+  return Promise.all([
+    redisClient.SET(`room:${roomCode}:count`, 0),
+    redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
+  ]);
 }
 
 export async function onDeleteRoomRedis(roomCode) {

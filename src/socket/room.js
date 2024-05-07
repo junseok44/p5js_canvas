@@ -9,6 +9,7 @@ import {
   getSessionIdsOfRoom,
   getUserListOfRoom,
   onStartGameRedis,
+  onUserJoinRoomRedis,
   onUserLeaveRoomRedis,
 } from "../redis/roomQuery.js";
 import { ROOM_STATUS } from "../constants/status.js";
@@ -37,36 +38,21 @@ export default function setupRoomSocket(room) {
     // TODO: lobby에 해당 방의 code와 인원수를 업데이트한다. 들어갔으니까 한명 추가하는 식으로.
 
     try {
-      const result = await redisClient.INCR(`room:${roomCode}:count`);
+      const cnt = await onUserJoinRoomRedis(
+        roomCode,
+        session.id,
+        session.username
+      );
 
       lobby.emit("update_room", {
         code: roomCode,
-        currentUserCount: result,
+        currentUserCount: cnt,
       });
     } catch (err) {
       console.log(err);
     }
 
     // TODO: 해당 방의 세션 id, socketid, username, 점수를 저장한다.
-
-    try {
-      await Promise.all([
-        redisClient.HSET(
-          `room:${roomCode}:user_names`,
-          session.id,
-          session.username
-        ),
-        redisClient.SADD(`room:${roomCode}:users`, session.id),
-      ]);
-
-      const POINTS = await redisClient.HGETALL(`room:${roomCode}:points`);
-
-      if (!POINTS[session.id]) {
-        await redisClient.HSET(`room:${roomCode}:points`, session.id, 0);
-      }
-    } catch (err) {
-      console.log(err);
-    }
 
     const userlist = await getUserListOfRoom(roomCode);
 
@@ -90,6 +76,8 @@ export default function setupRoomSocket(room) {
 
     socket.on("start_game", async () => {
       const STATUS = await getRoomStatus(roomCode);
+
+      console.log(STATUS);
 
       if (STATUS !== ROOM_STATUS.WAITING) {
         socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
@@ -167,16 +155,14 @@ export default function setupRoomSocket(room) {
     socket.on("disconnect", async () => {
       socket.leave(roomCode);
 
-      const sessions = await getSessionIdsOfRoom(roomCode);
-
-      await onUserLeaveRoomRedis(roomCode, session.id);
+      const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
 
       lobby.emit("update_room", {
         code: roomCode,
-        currentUserCount: sessions.length - 1,
+        currentUserCount: cnt,
       });
 
-      // if (sessions.length === 1) {
+      // if (cnt === 0) {
       //   try {
       //     await Promise.all([
       //       deleteRoom(roomCode),

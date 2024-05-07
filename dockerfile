@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-CMD echo $DATABASE_URL
-
 RUN npm install && npx prisma migrate dev && npx prisma generate
 
 EXPOSE 3000

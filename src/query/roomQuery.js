@@ -29,7 +29,10 @@ const getAllRooms = async () => {
   const rooms = await prisma.room.findMany();
 
   for (const room of rooms) {
-    const userCount = await redisClient.SCARD(`room:${room.code}:users`);
+    // const userCount = await redisClient.SCARD(`room:${room.code}:users`);
+
+    const userCount = await redisClient.get(`room:${room.code}:count`);
+
     room.currentUserCount = userCount;
     room.status =
       (await redisClient.get(`room:${room.code}:status`)) ||

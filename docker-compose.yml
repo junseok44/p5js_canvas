@@ -20,8 +20,10 @@ services:
   #   ports:
   #     - "8000:${SERVER_PORT}"
   #   depends_on:
-  #     - db
-  #     - redis
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
   #   environment:
   #     SERVER_PORT: ${SERVER_PORT}
   #     DATABASE_URL: ${DATABASE_URL}
@@ -29,8 +31,7 @@ services:
   #     - ./src:/app/src
   #     - ./public:/app/public
   #   env_file:
-  #     - path: ./.env
-    
+  #     - .env
 
   # react:
   #   build: ./client_react

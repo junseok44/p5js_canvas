@@ -2,11 +2,15 @@ import { formatMessage } from "../utils/message.js";
 import { getRoomCodeFromUrl } from "../utils/url.js";
 import { lobby, roomCodetoSessionMap, roomCodeToGameMap } from "../socket.js";
 import CatchMindGame from "../game.js";
-import { updateRoom, getRoomByCode, deleteRoom } from "../query/roomQuery.js";
+import {
+  updateRoom,
+  getRoomByCode,
+  deleteRoom,
+  getWordsOfRoom,
+} from "../query/roomQuery.js";
 import { redisClient } from "../redis_client.js";
 import {
   getRoomStatus,
-  getSessionIdsOfRoom,
   getUserListOfRoom,
   onStartGameRedis,
   onUserJoinRoomRedis,
@@ -35,8 +39,6 @@ export default function setupRoomSocket(room) {
     const username = session.username;
     session.save();
 
-    // TODO: lobby에 해당 방의 code와 인원수를 업데이트한다. 들어갔으니까 한명 추가하는 식으로.
-
     try {
       const cnt = await onUserJoinRoomRedis(
         roomCode,
@@ -51,8 +53,6 @@ export default function setupRoomSocket(room) {
     } catch (err) {
       console.log(err);
     }
-
-    // TODO: 해당 방의 세션 id, socketid, username, 점수를 저장한다.
 
     const userlist = await getUserListOfRoom(roomCode);
 
@@ -77,19 +77,20 @@ export default function setupRoomSocket(room) {
     socket.on("start_game", async () => {
       const STATUS = await getRoomStatus(roomCode);
 
-      console.log(STATUS);
-
       if (STATUS !== ROOM_STATUS.WAITING) {
         socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
         return;
       }
 
+      const wordBook = await getWordsOfRoom(roomCode);
+
       let game = new CatchMindGame(
         room,
         roomCode,
         socket,
-        roomCodeToGameMap,
-        lobby
+        lobby,
+        redisClient,
+        wordBook
       );
 
       game.startGame();
@@ -101,10 +102,7 @@ export default function setupRoomSocket(room) {
         status: ROOM_STATUS.PLAYING,
       });
 
-      // roomCodeToGameMap.set(roomCode, {
-      //   ...roomCodeToGameMap.get(roomCode),
-      //   hostId: game.host.id,
-      // });
+      // TODO: 해당 room Code의 hostId를 업데이트
     });
 
     socket.on("set_name", async (data) => {
@@ -139,9 +137,10 @@ export default function setupRoomSocket(room) {
     });
 
     socket.on("exit_room", async () => {
-      const count = await redisClient.DECR(`room:${roomCode}:count`);
+      const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
 
-      if (count === 0) {
+      console.log("exit", cnt);
+      if (cnt === 0) {
         await deleteRoom(roomCode);
         lobby.emit("delete_room", roomCode);
       } else {
@@ -162,47 +161,9 @@ export default function setupRoomSocket(room) {
         currentUserCount: cnt,
       });
 
-      // if (cnt === 0) {
-      //   try {
-      //     await Promise.all([
-      //       deleteRoom(roomCode),
-      //       onDeleteRoomRedis(roomCode),
-      //     ]);
-      //     lobby.emit("delete_room", roomCode);
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
-      // } else {
-      // }
-
       const userList = await getUserListOfRoom(roomCode);
+
       room.to(roomCode).emit("update_users", userList);
-
-      // 방이 아직 남아있다면.
-      // if (roomCodetoSessionMap.has(roomCode)) {
-      //   // db에서 현재인원 업데이트 후 lobby에 상태 업데이트
-      //   updateRoom(roomCode, -1, null)
-      //     .then((result) => {
-      //       if (result.affectedRows === 0 || result.changedRows === 0) {
-      //         return;
-      //       }
-      //       return getRoomByCode(roomCode);
-      //     })
-      //     .then((room) => {
-      //       lobby.emit("update_room", room);
-      //     })
-      //     .catch((err) => console.log(err));
-
-      // 해당 세션은 방 map에서 제거하기
-      // roomCodetoSessionMap.set(
-      //   roomCode,
-      //   roomCodetoSessionMap.get(roomCode).filter((s) => s.id !== session.id)
-      // );
-
-      // 룸의 다른 유저들의 유저목록 업데이트하기
-      // room
-      //   .to(roomCode)
-      //   .emit("update_users", roomCodetoSessionMap.get(roomCode));
 
       room.to(roomCode).emit("message", {
         msg: formatMessage("server", `${session.username}님이 방을 나가셨어요`),

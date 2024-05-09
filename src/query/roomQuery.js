@@ -43,11 +43,17 @@ const getAllRooms = async () => {
 };
 
 const createRoom = async (title, maximum, password) => {
+  // FIXME 임시로 만들어둔것. 나중에 삭제.
+  const wordBooks = await prisma.wordBook.findMany();
+
   const newRoom = await prisma.room.create({
     data: {
       title: title,
       ...(maximum && { maximum: maximum }),
       ...(password && { password: password }),
+      wordbook: {
+        connect: wordBooks,
+      },
     },
   });
 
@@ -75,6 +81,31 @@ const getRoomByCode = (roomCode) => {
   });
 };
 
+const getWordsOfRoom = async (roomCode) => {
+  const wordBooks = await prisma.wordBook.findMany({
+    where: {
+      rooms: {
+        some: {
+          code: roomCode,
+        },
+      },
+    },
+    select: {
+      words: true,
+    },
+  });
+
+  const words = [];
+
+  for (const rem of wordBooks) {
+    for (const w of rem.words) {
+      words.push(w.word);
+    }
+  }
+
+  return words;
+};
+
 export {
   getAllRooms,
   createRoom,
@@ -82,4 +113,5 @@ export {
   deleteRoom,
   getRoom,
   getRoomByCode,
+  getWordsOfRoom,
 };

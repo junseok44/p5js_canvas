@@ -29,14 +29,17 @@ export default (setRooms) => {
     });
 
     socket.on("update_room", (room) => {
-      console.log(room.code, room.currentUserCount);
-
       setRooms((rooms) => {
         return rooms.map((r) =>
-          r.code == room.code
+          r.code === room.code
             ? {
                 ...r,
-                currentUserCount: Number(room.currentUserCount),
+                currentUserCount:
+                  room.currentUserCount != null &&
+                  room.currentUserCount != undefined
+                    ? Number(room.currentUserCount)
+                    : r.currentUserCount,
+                status: room.status || r.status,
               }
             : r
         );

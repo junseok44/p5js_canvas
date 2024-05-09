@@ -9,6 +9,8 @@ import {
   ListItemText,
 } from "@mui/material";
 
+import { ROOM_STATUS } from "../constants/room_status";
+
 const Room = ({ title, current, limit, status, code }) => {
   return (
     <ListItemButton disableGutters>
@@ -55,8 +57,7 @@ const Room = ({ title, current, limit, status, code }) => {
                 <Typography
                   sx={{
                     display: "inline",
-                    // color: status ? "red" : "green",
-                    color: "green",
+                    color: status === ROOM_STATUS.WAITING ? "green" : "red",
                     fontWeight: "bold",
                   }}
                   component="span"

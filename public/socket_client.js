@@ -1,8 +1,25 @@
 let socket = io("/rooms");
 let currentRoomUsers = [];
 
+const ROOM_STATUS = {
+  WAITING: "대기중..",
+  PLAYING: "게임 실행중..",
+  DRAWING: "그림 그리는중..",
+  ANSWER: "답 기다리는중..",
+};
+
 socket.on("alert", (data) => {
   alert(data.msg);
+});
+
+socket.on("all_game_time", (data) => {
+  if (data[ROOM_STATUS.DRAWING]) {
+    setTimer(drawPhase, data[ROOM_STATUS.DRAWING]);
+  }
+
+  if (data[ROOM_STATUS.ANSWER]) {
+    setTimer(answerPhase, data[ROOM_STATUS.ANSWER]);
+  }
 });
 
 socket.on("message", (data) => {
@@ -41,15 +58,15 @@ socket.on("update_users", (data) => {
 
 socket.on("update_room_status", (data) => {
   switch (data.status) {
-    case "waiting":
+    case ROOM_STATUS.WAITING:
       changeGameStatus(waitingPhase);
       // setTimer(waitingPhase, data.time);
       break;
-    case "drawing":
+    case ROOM_STATUS.DRAWING:
       changeGameStatus(drawPhase);
       setTimer(drawPhase, data.time);
       break;
-    case "answer":
+    case ROOM_STATUS.ANSWER:
       changeGameStatus(answerPhase);
       setTimer(answerPhase, data.time);
       break;
@@ -61,10 +78,10 @@ socket.on("update_room_status", (data) => {
 
 socket.on("game_time", (data) => {
   switch (data.status) {
-    case "drawing":
+    case ROOM_STATUS.DRAWING:
       setTimer(drawPhase, data.time);
       break;
-    case "answer":
+    case ROOM_STATUS.ANSWER:
       setTimer(answerPhase, data.time);
       break;
     default:
@@ -90,6 +107,8 @@ socket.on("game_answerPhase", (data) => {
 });
 
 socket.on("game_end", (data) => {
+  clear();
+
   changeGameStatus(waitingPhase);
 });
 

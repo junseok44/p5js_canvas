@@ -78,6 +78,12 @@ export async function onStartGameRedis(roomCode) {
   ]);
 }
 
+export async function onEndGameRedis(roomCode) {
+  return Promise.all([
+    redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
+  ]);
+}
+
 export async function onCreateRoomRedis(roomCode) {
   return Promise.all([
     redisClient.SET(`room:${roomCode}:count`, 0),

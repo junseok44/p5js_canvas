@@ -1,88 +1,45 @@
+import { ROOM_STATUS } from "./constants/status.js";
 import { updateRoom, getRoomByCode } from "./query/roomQuery.js";
+import { getUserListOfRoom, onEndGameRedis } from "./redis/roomQuery.js";
 import { formatMessage } from "./utils/message.js";
 
-const question_words = [
-  "가격",
-  "창세기",
-  "가출",
-  "경찰",
-  "가족",
-  "연장전",
-  "퇴학",
-  "가수",
-  "냅킨",
-  "단감",
-  "단도",
-  "동맥",
-  "단백질",
-  "단추",
-  "방귀",
-  "보리",
-  "단풍",
-  "달걀",
-  "사막",
-  "명탐정",
-  "무전기",
-  "무지개",
-  "샌드백",
-  "순두부",
-  "수수떡",
-  "사이렌",
-  "우체통",
-  "입체파",
-  "유재석",
-  "작곡가",
-  "진공관",
-  "정문기입",
-  "저녁밥",
-  "종이컵",
-  "자판기",
-  "재활용",
-];
-
-const drawPhaseTime = 30000;
-const answerPhaseTime = 30000;
+const drawPhaseTime = 10000;
+const answerPhaseTime = 10000;
 
 class CatchMindGame {
   // 룸정보와, 게임을 시작한 host 정보가 있어야 하고.
-  constructor(room, roomCode, socket, map, lobby) {
+  constructor(room, roomCode, socket, lobby, redisClient, question_words) {
     this.room = room;
     this.lobby = lobby;
     this.roomCode = roomCode;
     this.host = socket;
     this.answer = "";
-    this.roomCodeToGameMap = map;
+    this.redis = redisClient;
+    this.wordBox = question_words;
   }
 
   drawPhase() {
-    this.roomCodeToGameMap.set(this.roomCode, {
-      ...this.roomCodeToGameMap.get(this.roomCode),
-      status: "drawing",
-    });
-
-    updateRoom(this.roomCode, null, true)
-      .then((res) => {
-        return getRoomByCode(this.roomCode);
-      })
-      .then((room) => {
-        this.lobby.emit("update_room", room);
-      });
-
-    // 만약 이 부분을 메모리에서 관리한다고 한다면,
-    // roomCodeToGameMap에 status를 drawing으로 바꿔주고, 시간을 30초로 설정해주면 됨.
+    // 게임 상태 변화는 그냥 redis에 따로 설정하는 일 없이, 그냥 socket으로만 보내줬음.
 
     this.room.to(this.roomCode).emit("game_drawPhase");
 
-    this.startRoomTimer(drawPhaseTime / 1000);
+    this.startRoomTimer(ROOM_STATUS.DRAWING, drawPhaseTime / 1000);
 
-    this.answer =
-      question_words[Math.floor(Math.random() * question_words.length)];
+    this.answer = this.wordBox[Math.floor(Math.random() * this.wordBox.length)];
+
+    // 각 게임 시간 보내줄것.
+
+    this.room.to(this.roomCode).emit("all_game_time", {
+      [ROOM_STATUS.DRAWING]: drawPhaseTime / 1000,
+      [ROOM_STATUS.ANSWER]: answerPhaseTime / 1000,
+    });
 
     this.host.emit("alert", {
       msg: `당신이 그릴 단어는 ${this.answer}입니다. ${
         drawPhaseTime / 1000
       }초 동안 그려주세요!}`,
     });
+
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
         "System",
@@ -90,6 +47,7 @@ class CatchMindGame {
       ),
       type: "system",
     });
+
     this.host.broadcast.emit("game_disable_canvas");
 
     setTimeout(() => {
@@ -98,16 +56,17 @@ class CatchMindGame {
   }
 
   async answerPhase() {
-    this.roomCodeToGameMap.set(this.roomCode, {
-      ...this.roomCodeToGameMap.get(this.roomCode),
-      status: "answer",
-    });
+    // this.roomCodeToGameMap.set(this.roomCode, {
+    //   ...this.roomCodeToGameMap.get(this.roomCode),
+    //   status: "answer",
+    // });
 
     this.room.to(this.roomCode).emit("game_answerPhase");
 
-    this.startRoomTimer(answerPhaseTime / 1000);
+    this.startRoomTimer(ROOM_STATUS.ANSWER, answerPhaseTime / 1000);
 
     this.room.to(this.roomCode).emit("game_disable_canvas");
+
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
         "System",
@@ -115,6 +74,7 @@ class CatchMindGame {
       ),
       type: "system",
     });
+
     let answerTimer = setTimeout(() => {
       this.room.to(this.roomCode).emit("message", {
         msg: formatMessage(
@@ -151,7 +111,7 @@ class CatchMindGame {
             ),
             type: "success",
           });
-          this.calculateScoreStep();
+          this.calculateScoreStep(socket.request.session.id);
         } else {
           this.room.to(this.roomCode).emit("message", {
             msg: formatMessage("system", `${data.answer}는 오답입니다!!`),
@@ -162,20 +122,27 @@ class CatchMindGame {
     });
   }
 
-  startRoomTimer(time) {
+  async startRoomTimer(status, time) {
     // time초동안 1초마다 room의 time을 1씩 줄여주고, 0이되면 clearInterval
+
+    // await this.redis.SET(`room:${this.roomCode}:time`, time);
 
     let timer = setInterval(() => {
       time -= 1;
 
-      this.roomCodeToGameMap.set(this.roomCode, {
-        ...this.roomCodeToGameMap.get(this.roomCode),
-        time: time,
-      });
+      // this.roomCodeToGameMap.set(this.roomCode, {
+      //   ...this.roomCodeToGameMap.get(this.roomCode),
+      //   time: time,
+      // });
+
+      // this.room.to(this.roomCode).emit("game_time", {
+      //   status: this.roomCodeToGameMap.get(this.roomCode).status,
+      //   time: this.roomCodeToGameMap.get(this.roomCode).time,
+      // });
 
       this.room.to(this.roomCode).emit("game_time", {
-        status: this.roomCodeToGameMap.get(this.roomCode).status,
-        time: this.roomCodeToGameMap.get(this.roomCode).time,
+        status,
+        time,
       });
 
       if (time == 0) {
@@ -185,11 +152,13 @@ class CatchMindGame {
     }, 1000);
   }
 
-  calculateScoreStep() {
+  async calculateScoreStep(winnerId) {
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage("system", "점수를 계산중입니다..."),
       type: "system",
     });
+
+    await this.redis.HINCRBY(`room:${this.roomCode}:points`, winnerId, 1);
 
     this.endGame();
   }
@@ -212,14 +181,12 @@ class CatchMindGame {
   }
 
   async endGame() {
-    updateRoom(this.roomCode, null, false)
-      .then((res) => {
-        return getRoomByCode(this.roomCode);
-      })
-      .then((room) => {
-        this.lobby.emit("update_room", room);
-      });
+    const [res] = await onEndGameRedis(this.roomCode);
 
+    this.lobby.emit("update_room", {
+      code: this.roomCode,
+      status: ROOM_STATUS.WAITING,
+    });
     this.room.to(this.roomCode).emit("game_end");
     this.room.to(this.roomCode).emit("game_reable_canvas");
 
@@ -229,15 +196,27 @@ class CatchMindGame {
       socket.removeAllListeners("send_answer");
     });
 
+    // const promises = sockets.map(async (socket) => {
+
+    //   const sessionId = socket.request.session.id;
+
+    //   await this.redis.HINCRBY(`room:${this.roomCode}:points`, sessionId, 1);
+    // });
+
+    // await Promise.all(promises);
+
+    const userlist = await getUserListOfRoom(this.roomCode);
+
+    this.room.to(this.roomCode).emit("update_users", userlist);
+
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage("System", "게임이 종료되었습니다. 다들 안녕~~"),
       type: "system",
     });
 
-    this.roomCodeToGameMap.set(this.roomCode, {
-      ...this.roomCodeToGameMap.get(this.roomCode),
-      status: "waiting",
-      hostId: null,
+    this.room.to(this.roomCode).emit("game_time", {
+      status: ROOM_STATUS.WAITING,
+      time: 0,
     });
   }
 }

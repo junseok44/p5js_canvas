@@ -6,6 +6,8 @@ import { redisClient } from "../redis_client.js";
 room:${roomCode}:count
 room:${roomCode}:game
 
+room:${roomCode}:hostId
+
 room:${roomCode}:users
 room:${roomCode}:user_names
 room:${roomCode}:points
@@ -72,15 +74,17 @@ export async function onUserLeaveRoomRedis(roomCode, sessionId) {
   }
 }
 
-export async function onStartGameRedis(roomCode) {
+export async function onStartGameRedis(roomCode, hostId) {
   await Promise.all([
     redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.PLAYING),
+    redisClient.SET(`room:${roomCode}:hostId`, hostId),
   ]);
 }
 
 export async function onEndGameRedis(roomCode) {
   return Promise.all([
     redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
+    redisClient.DEL(`room:${roomCode}:hostId`),
   ]);
 }
 
@@ -110,6 +114,14 @@ export async function getRoomStatus(roomCode) {
   } catch (err) {
     console.log(err);
     return "error";
+  }
+}
+
+export async function changeRoomStatus(roomCode, status) {
+  try {
+    await redisClient.SET(`room:${roomCode}:game`, status);
+  } catch (err) {
+    console.log(err);
   }
 }
 

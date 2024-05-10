@@ -41,12 +41,16 @@ socket.on("paint", function (data) {
 });
 
 socket.on("update_users", (data) => {
-  console.log(data);
-
   const userList = document.querySelector(".all_users");
   userList.innerHTML = "";
-  data.forEach((user) => {
+
+  let sortedUsers = data.sort((a, b) => {
+    return b.point - a.point;
+  });
+
+  sortedUsers.forEach((user) => {
     const node = document.createElement("li");
+    node.className = "user_item";
     const textnode = document.createTextNode(user.username);
     const pointNode = document.createElement("span");
     pointNode.innerHTML = `${user.point}점`;

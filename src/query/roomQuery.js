@@ -34,9 +34,10 @@ const getAllRooms = async () => {
     const userCount = await redisClient.get(`room:${room.code}:count`);
 
     room.currentUserCount = userCount;
-    room.status =
-      (await redisClient.get(`room:${room.code}:status`)) ||
-      ROOM_STATUS.WAITING;
+
+    const status = await redisClient.get(`room:${room.code}:game`);
+
+    room.status = status || ROOM_STATUS.WAITING;
   }
 
   return rooms;

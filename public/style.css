@@ -152,3 +152,8 @@ input[type="checkbox"]:not(:checked),
     height: 3rem;
   }
 }
+
+.user_item {
+  display: flex;
+  justify-content: space-between;
+}

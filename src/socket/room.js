@@ -1,15 +1,11 @@
 import { formatMessage } from "../utils/message.js";
 import { getRoomCodeFromUrl } from "../utils/url.js";
-import { lobby, roomCodetoSessionMap, roomCodeToGameMap } from "../socket.js";
+import { lobby } from "../socket.js";
 import CatchMindGame from "../game.js";
-import {
-  updateRoom,
-  getRoomByCode,
-  deleteRoom,
-  getWordsOfRoom,
-} from "../query/roomQuery.js";
+import { getWordsOfRoom } from "../query/roomQuery.js";
 import { redisClient } from "../redis_client.js";
 import {
+  changeRoomStatus,
   getRoomStatus,
   getUserListOfRoom,
   onStartGameRedis,
@@ -38,6 +34,8 @@ export default function setupRoomSocket(room) {
     session.username = session.username || "Guest";
     const username = session.username;
     session.save();
+
+    let game;
 
     try {
       const cnt = await onUserJoinRoomRedis(
@@ -79,12 +77,17 @@ export default function setupRoomSocket(room) {
 
       if (STATUS !== ROOM_STATUS.WAITING) {
         socket.emit("alert", { msg: "이미 게임이 진행중입니다." });
+
         return;
       }
 
+      await changeRoomStatus(roomCode, ROOM_STATUS.PLAYING);
+
       const wordBook = await getWordsOfRoom(roomCode);
 
-      let game = new CatchMindGame(
+      await onStartGameRedis(roomCode, session.id);
+
+      game = new CatchMindGame(
         room,
         roomCode,
         socket,
@@ -95,14 +98,10 @@ export default function setupRoomSocket(room) {
 
       game.startGame();
 
-      await onStartGameRedis(roomCode);
-
       lobby.emit("update_room", {
         code: roomCode,
         status: ROOM_STATUS.PLAYING,
       });
-
-      // TODO: 해당 room Code의 hostId를 업데이트
     });
 
     socket.on("set_name", async (data) => {
@@ -136,23 +135,32 @@ export default function setupRoomSocket(room) {
       });
     });
 
-    socket.on("exit_room", async () => {
-      const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
-
-      console.log("exit", cnt);
-      if (cnt === 0) {
-        await deleteRoom(roomCode);
-        lobby.emit("delete_room", roomCode);
-      } else {
-        lobby.emit("update_room", {
-          code: roomCode,
-          currentUserCount: count,
-        });
-      }
-    });
+    socket.on("exit_room", async () => {});
 
     socket.on("disconnect", async () => {
       socket.leave(roomCode);
+
+      const status = await getRoomStatus(roomCode);
+
+      if (status == ROOM_STATUS.DRAWING && game) {
+        const hostId = await redisClient.GET(`room:${roomCode}:hostId`);
+
+        if (hostId === session.id) {
+          // 근데 문제는, 이렇게 하면. 다른 서버에서 게임이 시작되고, 이 서버에서 이전에 남아있던 게임이 종료되는 문제가 발생할 수 있다.
+          // 그러면, 이전에 남아있던 게임이 종료되는 것을 방지해야한다.
+          // 그러면, 이전에 남아있던 게임을 어떻게 찾을 수 있을까?
+
+          room.to(roomCode).emit("message", {
+            msg: formatMessage(
+              "server",
+              "그리는 사람이 나가서 게임이 종료되었습니다."
+            ),
+            type: "fail",
+          });
+
+          game.endGameStep();
+        }
+      }
 
       const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
 
@@ -175,8 +183,12 @@ export default function setupRoomSocket(room) {
       room.to(roomCode).emit("paint", data);
     });
 
-    socket.on("reset", function (data) {
-      if (roomCodeToGameMap.get(roomCode)?.status === "answer") {
+    socket.on("reset", async function (data) {
+      // TODO: 이 부분 redis로 변경.
+
+      const status = await getRoomStatus(roomCode);
+
+      if (status === ROOM_STATUS.ANSWER) {
         socket.emit("message", {
           msg: formatMessage(
             "server",
@@ -185,17 +197,18 @@ export default function setupRoomSocket(room) {
           type: "fail",
         });
         return;
-      } else if (roomCodeToGameMap.get(roomCode)?.hostId) {
-        if (roomCodeToGameMap.get(roomCode)?.hostId !== socket.id) {
+      } else if (status === ROOM_STATUS.DRAWING) {
+        const hostId = await redisClient.GET(`room:${roomCode}:hostId`);
+
+        if (hostId !== session.id) {
           socket.emit("message", {
-            msg: formatMessage(
-              "server",
-              `다른 사람이 그림을 그리고 있어서 리셋할 수 없어요.`
-            ),
+            msg: formatMessage("server", `그리는 사람만 리셋할 수 있습니다.`),
             type: "fail",
           });
           return;
         }
+
+        return;
       }
 
       room.to(roomCode).emit("reset", data);

@@ -50,7 +50,10 @@ socket.on("update_users", (data) => {
 
   sortedUsers.forEach((user) => {
     const node = document.createElement("li");
-    node.className = "user_item";
+    node.className = `user_item ${user.id === socket.id ? "me" : ""} user_${
+      user.id
+    }`;
+
     const textnode = document.createTextNode(user.username);
     const pointNode = document.createElement("span");
     pointNode.innerHTML = `${user.point}점`;
@@ -58,6 +61,11 @@ socket.on("update_users", (data) => {
     node.appendChild(pointNode);
     userList.appendChild(node);
   });
+});
+
+socket.on("update_point", (data) => {
+  const point = document.querySelector(`.user_${data.id} span`);
+  point.innerHTML = `${data.point}점`;
 });
 
 socket.on("update_room_status", (data) => {

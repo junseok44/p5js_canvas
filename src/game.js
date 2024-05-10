@@ -28,6 +28,12 @@ class CatchMindGame {
       type: "system",
     });
     this.room.to(this.roomCode).emit("reset");
+
+    this.room.to(this.roomCode).emit("all_game_time", {
+      [ROOM_STATUS.DRAWING]: drawPhaseTime / 1000,
+      [ROOM_STATUS.ANSWER]: answerPhaseTime / 1000,
+    });
+
     this.drawStep();
   }
 
@@ -40,11 +46,6 @@ class CatchMindGame {
     this.startRoomTimer(ROOM_STATUS.DRAWING, drawPhaseTime / 1000);
 
     this.answer = this.wordBox[Math.floor(Math.random() * this.wordBox.length)];
-
-    this.room.to(this.roomCode).emit("all_game_time", {
-      [ROOM_STATUS.DRAWING]: drawPhaseTime / 1000,
-      [ROOM_STATUS.ANSWER]: answerPhaseTime / 1000,
-    });
 
     this.host.emit("alert", {
       msg: `당신이 그릴 단어는 ${this.answer}입니다. ${
@@ -137,7 +138,16 @@ class CatchMindGame {
       type: "system",
     });
 
-    await this.redis.HINCRBY(`room:${this.roomCode}:points`, winnerId, 1);
+    const point = await this.redis.HINCRBY(
+      `room:${this.roomCode}:points`,
+      winnerId,
+      1
+    );
+
+    this.room.to(this.roomCode).emit("update_point", {
+      id: winnerId,
+      point,
+    });
 
     this.endGameStep();
   }
@@ -149,10 +159,16 @@ class CatchMindGame {
     if (this.drawTimer) clearTimeout(this.drawTimer);
     if (this.answerTimer) clearTimeout(this.answerTimer);
 
+    this.room.to(this.roomCode).emit("all_game_time", {
+      [ROOM_STATUS.DRAWING]: 0,
+      [ROOM_STATUS.ANSWER]: 0,
+    });
+
     this.lobby.emit("update_room", {
       code: this.roomCode,
       status: ROOM_STATUS.WAITING,
     });
+
     this.room.to(this.roomCode).emit("game_end");
     this.room.to(this.roomCode).emit("game_reable_canvas");
 

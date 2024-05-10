@@ -11,7 +11,7 @@ const sessionMiddleware = session({
   secret: "secret",
   store: redisStore,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
 });
 
 export { sessionMiddleware };

@@ -14,7 +14,7 @@ import { ROOM_STATUS } from "../constants/room_status";
 const Room = ({ title, current, limit, status, code }) => {
   return (
     <ListItemButton disableGutters>
-      <a href={`http://localhost:8000/room/${code}`} style={{ width: "100%" }}>
+      <a href={`/room/${code}`} style={{ width: "100%" }}>
         <ListItem alignItems="flex-start">
           <ListItemAvatar>
             <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />

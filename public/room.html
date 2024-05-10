@@ -81,6 +81,9 @@
               <button class="waves-effect btn" onclick="startGame()">
                 게임 시작하기
               </button>
+              <button class="waves-effect btn" onclick="skipGame()">
+                내 차례 넘기기
+              </button>
             </div>
           </div>
 
@@ -159,6 +162,10 @@
 
     <!-- 메인 이벤트 핸들러 -->
     <script>
+      function skipGame() {
+        socket.emit("skip_game");
+      }
+
       function setName(event) {
         event.preventDefault();
         const nameInput = document.querySelector(".input__name");

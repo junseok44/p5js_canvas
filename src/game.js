@@ -53,6 +53,18 @@ class CatchMindGame {
       }초 동안 그려주세요!}`,
     });
 
+    this.host.on("skip_game", () => {
+      this.room.to(this.roomCode).emit("message", {
+        msg: formatMessage(
+          "System",
+          `${this.host.request.session.username}님이 그림을 그리지 않고 넘어갔습니다.`
+        ),
+        type: "system",
+      });
+
+      this.endGameStep();
+    });
+
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
         "System",
@@ -70,6 +82,8 @@ class CatchMindGame {
 
   async answerStep() {
     await changeRoomStatus(this.roomCode, ROOM_STATUS.ANSWER);
+
+    this.host.removeAllListeners("skip_game");
 
     this.room.to(this.roomCode).emit("game_answerPhase");
 
@@ -158,6 +172,8 @@ class CatchMindGame {
     if (this.timer) clearInterval(this.timer);
     if (this.drawTimer) clearTimeout(this.drawTimer);
     if (this.answerTimer) clearTimeout(this.answerTimer);
+
+    this.host.removeAllListeners("skip_game");
 
     this.room.to(this.roomCode).emit("all_game_time", {
       [ROOM_STATUS.DRAWING]: 0,

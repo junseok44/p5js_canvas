@@ -2,7 +2,7 @@ import { formatMessage } from "../utils/message.js";
 import { getRoomCodeFromUrl } from "../utils/url.js";
 import { lobby } from "../socket.js";
 import CatchMindGame from "../game.js";
-import { getWordsOfRoom } from "../query/roomQuery.js";
+import { deleteRoom, getWordsOfRoom } from "../query/roomQuery.js";
 import { redisClient } from "../redis_client.js";
 import {
   changeRoomStatus,
@@ -168,6 +168,36 @@ export default function setupRoomSocket(room) {
       });
     });
 
+    socket.on("exit_room", async () => {
+      try {
+        const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
+
+        if (cnt === -1) {
+          throw new Error("onUserLeaveRoomRedis Error");
+        }
+        if (cnt === 0) {
+          await deleteRoom(roomCode);
+          lobby.emit("delete_room", roomCode);
+          return;
+        }
+
+        const userList = await getUserListOfRoom(roomCode);
+
+        room.to(roomCode).emit("update_users", userList);
+
+        room.to(roomCode).emit("message", {
+          msg: formatMessage(
+            "system",
+            `${session.username}님이 방을 나가셨어요`
+          ),
+          type: "system",
+        });
+      } catch (err) {
+        console.log(err);
+        return;
+      }
+    });
+
     // 점검 완료. 테스트 필요.
     socket.on("disconnect", async () => {
       socket.leave(roomCode);
@@ -204,11 +234,6 @@ export default function setupRoomSocket(room) {
         console.log("onUserLeaveRoomRedis Error");
         return;
       }
-
-      lobby.emit("update_room", {
-        code: roomCode,
-        currentUserCount: cnt,
-      });
 
       const userList = await getUserListOfRoom(roomCode);
 

@@ -53,6 +53,8 @@ socket.on("update_users", (data) => {
     return b.point - a.point;
   });
 
+  currentRoomUsers = sortedUsers;
+
   sortedUsers.forEach((user) => {
     const node = document.createElement("li");
     node.className = `user_item ${user.id === socket.id ? "me" : ""} user_${

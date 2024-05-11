@@ -6,39 +6,25 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - "3306:${DB_PORT}"
+    # ports:
+    #   - "3306:${DB_PORT}"
     command: "--default-authentication-plugin=mysql_native_password"
     env_file:
       - .env
   redis:
     image: redis:6.0.9
+    # ports:
+    #   - "6379:6379"
+  express:
+    build: ./
     ports:
-      - "6379:6379"
-
-  # react: build 해야함.
-
-  # express:
-  #   build: ./
-  #   ports:
-  #     - "8000:${SERVER_PORT}"
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   environment:
-  #     SERVER_PORT: ${SERVER_PORT}
-  #     DATABASE_URL: ${DATABASE_URL}
-  #   volumes:
-  #     - ./src:/app/src
-  #     - ./public:/app/public
-  #   env_file:
-  #     - .env
-
-  # react:
-  #   build: ./client_react
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - express
+      - "8000:${SERVER_PORT}"
+    command: bash -c './wait-for-it.sh -h db -p 3306 && ./wait-for-it.sh -h redis -p 6379 && cd ./client && npm install && npm run build && cd .. && npx prisma migrate dev && npm prisma generate && npm run start'
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    env_file:
+      - .env

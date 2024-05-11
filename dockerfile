@@ -4,10 +4,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install && npx prisma migrate dev && npx prisma generate
+RUN npm install
 
 EXPOSE 3000
-
 
 ENTRYPOINT [ "npm", "start" ]
 

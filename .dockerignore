@@ -1,8 +1,8 @@
-
 .node_modules   
 .gitignore
-.client_react
 .TODO.md
+.DB.md
+.TIL.md
 .env
 .env.example
 .git

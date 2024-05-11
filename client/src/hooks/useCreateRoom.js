@@ -11,13 +11,11 @@ const useCreateRoom = () => {
   const socket = useRecoilValue(socketState);
 
   const submitForm = () => {
-    setIsRoomCreateModal(false);
-
     if (roomForm.roomTitle == "" || roomForm.roomTitle.length > 15) {
       alert("방 제목은 1자 이상 15자 이하로 입력해주세요.");
       return;
     }
-
+    햣;
     if (roomForm.wordBookIds.length == 0) {
       alert("단어장을 선택해주세요.");
       return;
@@ -30,6 +28,8 @@ const useCreateRoom = () => {
       roomTitle: "",
       wordBookIds: [],
     });
+
+    setIsRoomCreateModal(false);
   };
 
   return {

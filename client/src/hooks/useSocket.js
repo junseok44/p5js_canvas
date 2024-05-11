@@ -25,7 +25,6 @@ export default (setRooms) => {
     });
 
     socket.on("update_rooms", (data) => {
-      console.log(data);
       setRooms(data);
     });
 

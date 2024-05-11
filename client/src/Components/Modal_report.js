@@ -13,15 +13,12 @@ const Modal_report = ({
     <Modal_overlay>
       <Modal_content>
         <Typography variant="h5" sx={{ mb: 1 }}>
-          버그신고 & 건의사항
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          이 개발자는 무료로 해드립니다.
+          버그신고 & 원하는 기능
         </Typography>
 
         <textarea
           onChange={onChangeReport}
-          placeholder="나쁜말은 삼가주세요ㅠㅠ"
+          placeholder=""
           style={{
             width: "100%",
             height: "10rem",

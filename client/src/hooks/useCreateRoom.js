@@ -6,28 +6,29 @@ const useCreateRoom = () => {
   const [isRoomCreateModal, setIsRoomCreateModal] = useState(false);
   const [roomForm, setRoomForm] = useState({
     roomTitle: "",
-    roomMax: 4,
-    roomPublic: true,
-    roomPassword: "",
-    roomPasswordCheck: "",
+    wordBookIds: [],
   });
   const socket = useRecoilValue(socketState);
 
   const submitForm = () => {
     setIsRoomCreateModal(false);
 
-    //TODO 여기서 Room validate해줘야 한다.
-    if (roomForm.roomTitle == "" || roomForm.roomTitle.length > 15) return;
+    if (roomForm.roomTitle == "" || roomForm.roomTitle.length > 15) {
+      alert("방 제목은 1자 이상 15자 이하로 입력해주세요.");
+      return;
+    }
+
+    if (roomForm.wordBookIds.length == 0) {
+      alert("단어장을 선택해주세요.");
+      return;
+    }
 
     // 여기서 이제 쿼리를 보낸다.
     socket.emit("create_room", roomForm);
 
     setRoomForm({
       roomTitle: "",
-      roomMax: 4,
-      roomPublic: true,
-      roomPassword: "",
-      roomPasswordCheck: "",
+      wordBookIds: [],
     });
   };
 

@@ -110,8 +110,7 @@ export default () => {
             </a>
           </Box>
         </Box>
-        <Box sx={{ mb: 2 }}></Box>
-
+        <Box sx={{ mb: 4 }}></Box>
         <h3>방 목록</h3>
         <List
           sx={{

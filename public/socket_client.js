@@ -6,7 +6,12 @@ const ROOM_STATUS = {
   PLAYING: "게임 실행중..",
   DRAWING: "그림 그리는중..",
   ANSWER: "답 기다리는중..",
+  ERROR: "에러",
 };
+
+socket.on("redirect", function (destination) {
+  window.location.href = destination;
+});
 
 socket.on("alert", (data) => {
   alert(data.msg);
@@ -72,7 +77,6 @@ socket.on("update_room_status", (data) => {
   switch (data.status) {
     case ROOM_STATUS.WAITING:
       changeGameStatus(waitingPhase);
-      // setTimer(waitingPhase, data.time);
       break;
     case ROOM_STATUS.DRAWING:
       changeGameStatus(drawPhase);
@@ -81,6 +85,10 @@ socket.on("update_room_status", (data) => {
     case ROOM_STATUS.ANSWER:
       changeGameStatus(answerPhase);
       setTimer(answerPhase, data.time);
+      break;
+    case ROOM_STATUS.ERROR:
+      alert("에러가 발생했습니다. 로비로 돌아갑니다.");
+      window.location.href = "/";
       break;
     default:
       changeGameStatus(waitingPhase);

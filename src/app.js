@@ -6,6 +6,7 @@ import { getDirname } from "./utils/dir.js";
 import http from "http";
 import { getRoomStatus } from "./redis/roomQuery.js";
 import { ROOM_STATUS } from "./constants/status.js";
+import { prisma } from "./db.js";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -54,10 +55,13 @@ app.get("/api/room/:code", async (req, res, next) => {
   }
 });
 
-app.get("/api/words/:code", async (req, res, next) => {
+app.get("/api/words", async (req, res, next) => {
   try {
-    const words = await getWordsOfRoom(Number(req.query.roomCode));
-    res.send(words);
+    const wordBooks = await prisma.wordBook.findMany({
+      take: 10,
+    });
+
+    res.send(wordBooks);
   } catch (error) {
     return next(error);
   }

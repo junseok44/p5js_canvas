@@ -36,6 +36,7 @@ export async function getUserListOfRoom(roomCode) {
     return users;
   } catch (err) {
     console.log(err);
+    return [];
   }
 }
 
@@ -56,6 +57,7 @@ export async function onUserJoinRoomRedis(roomCode, sessionId, username) {
     return cnt;
   } catch (err) {
     console.log(err);
+    return -1;
   }
 }
 
@@ -71,8 +73,11 @@ export async function onUserLeaveRoomRedis(roomCode, sessionId) {
     return cnt;
   } catch (err) {
     console.log(err);
+    return -1;
   }
 }
+
+// TODO: 이부분도 try catch ㅓ처리해주기,
 
 export async function onStartGameRedis(roomCode, hostId) {
   await Promise.all([
@@ -110,13 +115,14 @@ export async function onDeleteRoomRedis(roomCode) {
 export async function getRoomStatus(roomCode) {
   try {
     const status = await redisClient.GET(`room:${roomCode}:game`);
-    return status;
+    return status || ROOM_STATUS.ERROR;
   } catch (err) {
     console.log(err);
-    return "error";
+    return ROOM_STATUS.ERROR;
   }
 }
 
+// 이 부분을 어떻게 할 것인지.
 export async function changeRoomStatus(roomCode, status) {
   try {
     await redisClient.SET(`room:${roomCode}:game`, status);

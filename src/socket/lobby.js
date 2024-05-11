@@ -10,7 +10,10 @@ export default function setupLobbySocket(lobby) {
 
     socket.on("create_room", async (data) => {
       try {
-        const newRoom = await createRoom(data.roomTitle);
+        const newRoom = await createRoom(data.roomTitle, data.wordBookIds);
+        if (newRoom === null) {
+          return;
+        }
         lobby.emit("create_room", newRoom);
       } catch (err) {
         console.log(err);

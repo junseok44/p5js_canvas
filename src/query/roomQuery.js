@@ -43,27 +43,39 @@ const getAllRooms = async () => {
   return rooms;
 };
 
-const createRoom = async (title, maximum, password) => {
-  // FIXME 임시로 만들어둔것. 나중에 삭제.
-  const wordBooks = await prisma.wordBook.findMany();
-
-  const newRoom = await prisma.room.create({
-    data: {
-      title: title,
-      ...(maximum && { maximum: maximum }),
-      ...(password && { password: password }),
-      wordbook: {
-        connect: wordBooks,
+const createRoom = async (title, wordBookIds) => {
+  try {
+    const wordBooks = await prisma.wordBook.findMany({
+      where: {
+        id: {
+          in: wordBookIds,
+        },
       },
-    },
-  });
+    });
 
-  await onCreateRoomRedis(newRoom.code);
+    if (wordBooks.length === 0) {
+      return null;
+    }
 
-  newRoom.status = ROOM_STATUS.WAITING;
-  newRoom.currentUserCount = 0;
+    const newRoom = await prisma.room.create({
+      data: {
+        title: title,
+        wordbook: {
+          connect: wordBooks,
+        },
+      },
+    });
 
-  return newRoom;
+    await onCreateRoomRedis(newRoom.code);
+
+    newRoom.status = ROOM_STATUS.WAITING;
+    newRoom.currentUserCount = 0;
+
+    return newRoom;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
 
 const getRoom = (roomId) => {
@@ -83,28 +95,33 @@ const getRoomByCode = (roomCode) => {
 };
 
 const getWordsOfRoom = async (roomCode) => {
-  const wordBooks = await prisma.wordBook.findMany({
-    where: {
-      rooms: {
-        some: {
-          code: roomCode,
+  try {
+    const wordBooks = await prisma.wordBook.findMany({
+      where: {
+        rooms: {
+          some: {
+            code: roomCode,
+          },
         },
       },
-    },
-    select: {
-      words: true,
-    },
-  });
+      select: {
+        words: true,
+      },
+    });
 
-  const words = [];
+    const words = [];
 
-  for (const rem of wordBooks) {
-    for (const w of rem.words) {
-      words.push(w.word);
+    for (const rem of wordBooks) {
+      for (const w of rem.words) {
+        words.push(w.word);
+      }
     }
-  }
 
-  return words;
+    return words;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
 };
 
 export {

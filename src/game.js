@@ -24,7 +24,7 @@ class CatchMindGame {
 
   startGame() {
     this.room.to(this.roomCode).emit("game_start", {
-      msg: formatMessage("System", "게임을 시작합니다."),
+      msg: formatMessage("system", "게임을 시작합니다."),
       type: "system",
     });
     this.room.to(this.roomCode).emit("reset");
@@ -56,7 +56,7 @@ class CatchMindGame {
     this.host.on("skip_game", () => {
       this.room.to(this.roomCode).emit("message", {
         msg: formatMessage(
-          "System",
+          "system",
           `${this.host.request.session.username}님이 그림을 그리지 않고 넘어갔습니다.`
         ),
         type: "system",
@@ -67,7 +67,7 @@ class CatchMindGame {
 
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
-        "System",
+        "system",
         `${this.host.request.session.username}님이 그림을 그리고 있습니다....`
       ),
       type: "system",
@@ -93,7 +93,7 @@ class CatchMindGame {
 
     this.room.to(this.roomCode).emit("message", {
       msg: formatMessage(
-        "System",
+        "system",
         `이제 정답을 맞춰주세요! ${answerPhaseTime / 1000}초 드립니다.`
       ),
       type: "system",
@@ -199,7 +199,7 @@ class CatchMindGame {
     this.room.to(this.roomCode).emit("update_users", userlist);
 
     this.room.to(this.roomCode).emit("message", {
-      msg: formatMessage("System", "게임이 종료되었습니다."),
+      msg: formatMessage("system", "게임이 종료되었습니다."),
       type: "system",
     });
 

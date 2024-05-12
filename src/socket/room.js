@@ -168,30 +168,10 @@ export default function setupRoomSocket(room) {
       });
     });
 
-    socket.on("exit_room", async () => {
+    socket.on("delete_room", async () => {
       try {
-        const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
-
-        if (cnt === -1) {
-          throw new Error("onUserLeaveRoomRedis Error");
-        }
-        if (cnt === 0) {
-          await deleteRoom(roomCode);
-          lobby.emit("delete_room", roomCode);
-          return;
-        }
-
-        const userList = await getUserListOfRoom(roomCode);
-
-        room.to(roomCode).emit("update_users", userList);
-
-        room.to(roomCode).emit("message", {
-          msg: formatMessage(
-            "system",
-            `${session.username}님이 방을 나가셨어요`
-          ),
-          type: "system",
-        });
+        await deleteRoom(roomCode);
+        lobby.emit("delete_room", roomCode);
       } catch (err) {
         console.log(err);
         return;
@@ -230,6 +210,8 @@ export default function setupRoomSocket(room) {
 
       const cnt = await onUserLeaveRoomRedis(roomCode, session.id);
 
+      // FIXME: 여전히 여기 에러있음
+
       if (cnt === -1) {
         console.log("onUserLeaveRoomRedis Error");
         return;
@@ -242,6 +224,11 @@ export default function setupRoomSocket(room) {
       room.to(roomCode).emit("message", {
         msg: formatMessage("system", `${session.username}님이 방을 나가셨어요`),
         type: "system",
+      });
+
+      lobby.emit("update_room", {
+        code: roomCode,
+        currentUserCount: cnt,
       });
     });
 

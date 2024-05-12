@@ -208,7 +208,7 @@
       function exitGame() {
         if (currentRoomUsers.length === 1) {
           if (confirm("당신이 나가시면 방이 삭제됩니다. 정말 나가시겠어요?")) {
-            socket.emit("exit_room");
+            socket.emit("delete_room");
             window.location.href = "/";
           }
         } else {

@@ -15,7 +15,6 @@ const useCreateRoom = () => {
       alert("방 제목은 1자 이상 15자 이하로 입력해주세요.");
       return;
     }
-    햣;
     if (roomForm.wordBookIds.length == 0) {
       alert("단어장을 선택해주세요.");
       return;

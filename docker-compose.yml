@@ -19,7 +19,6 @@ services:
     build: ./
     ports:
       - "8000:${SERVER_PORT}"
-    command: bash -c './wait-for-it.sh -h db -p 3306 && ./wait-for-it.sh -h redis -p 6379 && cd ./client && npm install && npm run build && cd .. && npx prisma migrate dev && npm prisma generate && npm run start'
     environment:
       SERVER_PORT: ${SERVER_PORT}
       DATABASE_URL: ${DATABASE_URL}

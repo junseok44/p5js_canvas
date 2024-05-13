@@ -10,12 +10,13 @@ let canvasHeight = 400;
 function setup() {
   let canvasDiv = document.getElementById("roomContainer");
   let width = getContentWidth(canvasDiv);
-  canvas1 = createCanvas(width, canvasHeight);
+  canvas1 = createCanvas(width - 10, canvasHeight);
   canvas1.parent("roomContainer");
   strokeWeight(cursorWidth);
   stroke(paintColor);
   background(255);
 }
+
 function draw() {
   if (mouseIsPressed && !isDisabled) {
     if (!touchTriggered) {
@@ -56,6 +57,15 @@ function reableCanvas() {
 }
 
 const colorItems = document.querySelectorAll(".color__item");
+
+const pen = document.getElementsByClassName("black_pen");
+
+if (pen.length > 0) {
+  pen[0].addEventListener("click", () => {
+    changeStrokeColor("black");
+  });
+}
+
 colorItems.forEach((item) => {
   item.addEventListener("click", (e) => {
     colorItems.forEach((item) => {
@@ -69,6 +79,7 @@ colorItems.forEach((item) => {
 window.addEventListener("resize", () => {
   let canvasDiv = document.getElementById("roomContainer");
   let width = getContentWidth(canvasDiv);
+
   resizeCanvas(width, canvasHeight);
   // background(255);
   // strokeWeight(cursorWidth);

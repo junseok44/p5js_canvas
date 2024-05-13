@@ -9,6 +9,8 @@ const ROOM_STATUS = {
   ERROR: "에러",
 };
 
+let gameStatus = ROOM_STATUS.WAITING;
+
 socket.on("redirect", function (destination) {
   window.location.href = destination;
 });
@@ -76,16 +78,20 @@ socket.on("update_point", (data) => {
 });
 
 socket.on("update_room_status", (data) => {
+  console.log("updateroom status", data.status);
   switch (data.status) {
     case ROOM_STATUS.WAITING:
       changeGameStatus(waitingPhase);
+      gameStatus = ROOM_STATUS.WAITING;
       break;
     case ROOM_STATUS.DRAWING:
       changeGameStatus(drawPhase);
+      gameStatus = ROOM_STATUS.DRAWING;
       setTimer(drawPhase, data.time);
       break;
     case ROOM_STATUS.ANSWER:
       changeGameStatus(answerPhase);
+      gameStatus = ROOM_STATUS.ANSWER;
       setTimer(answerPhase, data.time);
       break;
     case ROOM_STATUS.ERROR:
@@ -130,7 +136,6 @@ socket.on("game_answerPhase", (data) => {
 
 socket.on("game_end", (data) => {
   clear();
-
   changeGameStatus(waitingPhase);
 });
 

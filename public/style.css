@@ -8,8 +8,29 @@ body {
   padding: 0 1rem;
 }
 
-.p5Canvas {
+.unset {
+  all: unset;
+}
+
+#roomContainer {
+  position: relative;
   border: 1px solid rgb(178, 190, 195);
+}
+
+.canvas__controller {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  z-index: 100;
+  background-color: white;
+}
+
+.p5Canvas {
   box-sizing: border-box;
   touch-action: none;
 }
@@ -34,6 +55,7 @@ body {
 
 .color__palette {
   display: flex;
+  gap: 0.2rem;
 }
 .color__item {
   width: 2rem;
@@ -117,6 +139,25 @@ input[type="checkbox"]:not(:checked),
 
 .label_answerCheck {
   min-width: max-content;
+}
+
+.game_icon {
+  font-size: 2rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.game_icon:hover {
+  opacity: 0.7;
+}
+
+.status_item {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.small {
+  font-size: 0.8rem;
 }
 
 #red {

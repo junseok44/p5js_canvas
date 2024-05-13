@@ -4,7 +4,15 @@ const waitingPhase = allSteps[0];
 const drawPhase = allSteps[1];
 const answerPhase = allSteps[2];
 
+let isAnswerPhase = false;
+
 function changeGameStatus(phase) {
+  if (phase == answerPhase) {
+    isAnswerPhase = true;
+  } else {
+    isAnswerPhase = false;
+  }
+
   allSteps.forEach((step) => {
     step.classList.add("disabled");
   });

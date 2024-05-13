@@ -8,8 +8,8 @@ import {
 } from "./redis/roomQuery.js";
 import { formatMessage } from "./utils/message.js";
 
-const drawPhaseTime = 20000;
-const answerPhaseTime = 20000;
+const drawPhaseTime = 30000;
+const answerPhaseTime = 30000;
 
 class CatchMindGame {
   constructor(room, roomCode, socket, lobby, redisClient, question_words) {

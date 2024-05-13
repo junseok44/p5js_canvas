@@ -16,87 +16,104 @@
     <div class="container">
       <div class="myrow valign-wrapper space_between">
         <h5>
-          <span>방제목 : <span class="room__name"></span></span>
+          <span>Title : <span class="room__name"></span></span>
         </h5>
-        <button class="waves-effect btn" onclick="exitGame()">
-          로비로 나가기
-        </button>
+        <!-- <button class="waves-effect btn" onclick="exitGame()"> -->
+        <!-- 로비로 나가기 -->
+
+        <!-- </button> -->
       </div>
 
       <div class="margin_1"></div>
 
       <div class="row">
         <div class="col s12 m8">
-          <div id="roomContainer"></div>
-          <div class="canvas__controller">
-            <label for="strokeWeight">펜 크기</label>
-            <input
-              type="range"
-              max="20"
-              min="1"
-              id="strokeWeight"
-              onchange="onChangeStrokeWeight(event)"
-            />
-            <button onclick="setEraser()">지우개</button>
-            <button onclick="setPaint()">검은펜</button>
-            <button onclick="resetCanvas()">리셋하기</button>
+          <div id="roomContainer">
+            <div class="canvas__controller">
+              <i class="fa-solid fa-pen game_icon black_pen"></i>
+              <i
+                class="fa-solid fa-eraser game_icon small"
+                onclick="setEraser()"
+              ></i>
+              <input
+                type="range"
+                max="20"
+                min="1"
+                id="strokeWeight"
+                onchange="onChangeStrokeWeight(event)"
+              />
 
-            <div class="color__palette">
-              <div class="color__item" id="red"></div>
-              <div class="color__item" id="yellow"></div>
-              <div class="color__item" id="green"></div>
-              <div class="color__item" id="orange"></div>
-              <div class="color__item" id="pink"></div>
+              <i
+                class="fa-solid fa-arrows-rotate game_icon small"
+                onclick="resetCanvas()"
+              ></i>
+              <div class="color__palette">
+                <div class="color__item" id="black"></div>
+                <div class="color__item" id="red"></div>
+                <div class="color__item" id="yellow"></div>
+                <div class="color__item" id="green"></div>
+                <div class="color__item" id="orange"></div>
+                <div class="color__item" id="pink"></div>
+              </div>
             </div>
-            <div class="margin_1"></div>
           </div>
-        </div>
-        <div class="col s12 m4">
+
           <div class="card">
             <div class="card-content">
-              <span class="card-title bold">채팅</span>
+              <span class="card-title bold">Chatting</span>
               <div class="chatting__messages"></div>
             </div>
             <div class="card-action">
               <form class="chatting__form myrow" onsubmit="send_message(event)">
                 <input type="text" class="chatting__input white" />
-                <button class="waves-effect btn">전송</button>
-                <label for="answerCheck" class="label_answerCheck"
+                <button class="unset game_icon">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+                <!-- <label for="answerCheck" class="label_answerCheck"
                   >정답 입력</label
                 >
-                <input type="checkbox" id="answerCheck" />
+                <input type="checkbox" id="answerCheck" /> -->
               </form>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m4">
+          <div class="card">
+            <div class="card-content myrow space_between">
+              <!-- <button class="waves-effect btn" onclick="startGame()">
+                  게임 시작하기
+                </button> -->
+              <i class="fa-solid fa-play game_icon" onclick="startGame()"></i>
+              <button class="waves-effect btn" onclick="skipGame()">
+                Skip
+              </button>
+              <i
+                class="fa-solid fa-right-from-bracket game_icon"
+                onclick="exitGame()"
+              ></i>
             </div>
           </div>
           <div class="card">
             <div class="card-content">
-              <span class="card-title bold">게임상태 </span>
+              <span class="card-title bold">Status </span>
               <ul class="game_status_list">
-                <li class="waitingPhase">대기중...</li>
-                <li class="drawPhase disabled">그리기 단계 <span>0</span>초</li>
-                <li class="answerPhase disabled">
-                  맞추기 단계 <span>0</span>초
-                </li>
+                <li class="waitingPhase">waiting...</li>
+                <li class="drawPhase disabled">drawing <span>0</span>초</li>
+                <li class="answerPhase disabled">answer <span>0</span>초</li>
               </ul>
-              <button class="waves-effect btn" onclick="startGame()">
-                게임 시작하기
-              </button>
-              <button class="waves-effect btn" onclick="skipGame()">
-                내 차례 넘기기
-              </button>
             </div>
           </div>
 
           <div class="card">
             <div class="card-content">
-              <span class="card-title bold">현재 접속자 </span>
+              <span class="card-title bold">Current User</span>
 
               <div class="user_container">
                 <ul class="all_users"></ul>
               </div>
             </div>
             <div class="card-action">
-              (당신의 이름 : <span id="username"></span>)
+              (You : <span id="username"></span>)
               <form onsubmit="setName(event)" class="myrow">
                 <input type="text" class="input__name" />
                 <button type="submit" class="btn__set-name waves-effect btn">
@@ -110,7 +127,13 @@
       <div class="margin_1"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <script
       language="javascript"
       type="text/javascript"
@@ -118,8 +141,8 @@
     ></script>
     <script src="/p5.min.js"></script>
     <script src="/paint.js"></script>
-    <script src="/game_status.js"></script>
     <script src="/socket_client.js"></script>
+    <script src="/game_status.js"></script>
 
     <!-- msg 보내기 관련 -->
     <script>
@@ -178,9 +201,14 @@
         event.preventDefault();
         var msg = msgInput.value;
         if (msg === "") return;
-        isAnswerCheck.checked
+
+        isAnswerPhase
           ? socket.emit("send_answer", { answer: msg })
           : socket.emit("send_msg", { msg: msg });
+
+        // isAnswerCheck.checked
+        //   ? socket.emit("send_answer", { answer: msg })
+        //   : socket.emit("send_msg", { msg: msg });
 
         msgInput.value = "";
       }

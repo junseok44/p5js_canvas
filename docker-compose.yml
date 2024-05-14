@@ -9,6 +9,8 @@ services:
     # ports:
     #   - "3306:${DB_PORT}"
     command: "--default-authentication-plugin=mysql_native_password"
+    volumes:
+      - ./backup.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - .env
   redis:

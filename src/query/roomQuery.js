@@ -3,6 +3,7 @@ import { prisma } from "../db.js";
 import { onCreateRoomRedis, onDeleteRoomRedis } from "../redis/roomQuery.js";
 import { redisClient } from "../redis_client.js";
 
+// ok
 const deleteRoom = async (code) => {
   await onDeleteRoomRedis(code);
   await prisma.room.delete({
@@ -12,37 +13,31 @@ const deleteRoom = async (code) => {
   });
 };
 
-const updateRoom = (id, increment) => {
-  return prisma.room.update({
-    where: {
-      id: id,
-    },
-    data: {
-      currentUserCount: {
-        increment: increment,
-      },
-    },
-  });
-};
-
+// ok
 const getAllRooms = async () => {
-  const rooms = await prisma.room.findMany();
+  try {
+    const rooms = await prisma.room.findMany();
 
-  for (const room of rooms) {
-    // const userCount = await redisClient.SCARD(`room:${room.code}:users`);
+    for (const room of rooms) {
+      // const userCount = await redisClient.SCARD(`room:${room.code}:users`);
 
-    const userCount = await redisClient.get(`room:${room.code}:count`);
+      const userCount = await redisClient.get(`room:${room.code}:count`);
 
-    room.currentUserCount = userCount;
+      room.currentUserCount = userCount;
 
-    const status = await redisClient.get(`room:${room.code}:game`);
+      const status = await redisClient.get(`room:${room.code}:game`);
 
-    room.status = status || ROOM_STATUS.WAITING;
+      room.status = status || ROOM_STATUS.WAITING;
+    }
+
+    return rooms;
+  } catch (err) {
+    console.log(err);
+    return [];
   }
-
-  return rooms;
 };
 
+// ok
 const createRoom = async (title, wordBookIds) => {
   try {
     const wordBooks = await prisma.wordBook.findMany({
@@ -78,22 +73,23 @@ const createRoom = async (title, wordBookIds) => {
   }
 };
 
-const getRoom = (roomId) => {
-  return prisma.room.findFirst({
-    where: {
-      id: roomId,
-    },
-  });
+// ok.
+const getRoomByCode = async (roomCode) => {
+  try {
+    const room = await prisma.room.findFirst({
+      where: {
+        code: roomCode,
+      },
+    });
+
+    return room;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
 
-const getRoomByCode = (roomCode) => {
-  return prisma.room.findFirst({
-    where: {
-      code: roomCode,
-    },
-  });
-};
-
+// ok
 const getWordsOfRoom = async (roomCode) => {
   try {
     const wordBooks = await prisma.wordBook.findMany({
@@ -124,12 +120,4 @@ const getWordsOfRoom = async (roomCode) => {
   }
 };
 
-export {
-  getAllRooms,
-  createRoom,
-  updateRoom,
-  deleteRoom,
-  getRoom,
-  getRoomByCode,
-  getWordsOfRoom,
-};
+export { getAllRooms, createRoom, deleteRoom, getRoomByCode, getWordsOfRoom };

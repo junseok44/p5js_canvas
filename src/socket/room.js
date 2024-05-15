@@ -28,6 +28,8 @@ export default function setupRoomSocket(room) {
       });
     });
 
+    console.log("room connected");
+
     const roomCode = Number(getRoomCodeFromUrl(socket));
     socket.join(roomCode);
 

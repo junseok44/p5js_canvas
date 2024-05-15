@@ -16,6 +16,10 @@ export default (setRooms) => {
       setConnected(true);
     });
 
+    socket.on("alert", (data) => {
+      alert(data.msg);
+    });
+
     socket.on("disconnect", () => {
       setConnected(false);
     });

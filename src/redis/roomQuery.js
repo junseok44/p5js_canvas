@@ -77,8 +77,6 @@ export async function onUserLeaveRoomRedis(roomCode, sessionId) {
   }
 }
 
-// TODO: 이부분도 try catch ㅓ처리해주기,
-
 export async function onStartGameRedis(roomCode, hostId) {
   await Promise.all([
     redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.PLAYING),
@@ -87,10 +85,17 @@ export async function onStartGameRedis(roomCode, hostId) {
 }
 
 export async function onEndGameRedis(roomCode) {
-  return Promise.all([
-    redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
-    redisClient.DEL(`room:${roomCode}:hostId`),
-  ]);
+  try {
+    const [status, res1] = await Promise.all([
+      redisClient.SET(`room:${roomCode}:game`, ROOM_STATUS.WAITING),
+      redisClient.DEL(`room:${roomCode}:hostId`),
+    ]);
+
+    return status;
+  } catch (err) {
+    console.log(err);
+    return ROOM_STATUS.ERROR;
+  }
 }
 
 export async function onCreateRoomRedis(roomCode) {

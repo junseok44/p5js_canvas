@@ -1,15 +1,13 @@
 import { ROOM_STATUS } from "./constants/status.js";
-import { updateRoom, getRoomByCode } from "./query/roomQuery.js";
 import {
   changeRoomStatus,
-  getRoomStatus,
   getUserListOfRoom,
   onEndGameRedis,
 } from "./redis/roomQuery.js";
 import { formatMessage } from "./utils/message.js";
 
-const drawPhaseTime = 30000;
-const answerPhaseTime = 30000;
+const drawPhaseTime = 35000;
+const answerPhaseTime = 25000;
 
 class CatchMindGame {
   constructor(room, roomCode, socket, lobby, redisClient, question_words) {
